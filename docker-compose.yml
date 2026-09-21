@@ -13,6 +13,7 @@ services:
       - '7080:80'
     volumes:
       - ./app:/var/php
+      - ./toubilib.env:/var/toubilib.env:ro
     working_dir: /var/php
     networks:
       - toubilib.net
