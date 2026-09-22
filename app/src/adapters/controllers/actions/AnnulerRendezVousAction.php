@@ -10,8 +10,6 @@ use toubilib\application\ports\api\ServiceRendezVousInterface;
 use toubilib\domain\exceptions\RendezVousDejaPasseException;
 use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 
-use toubilib\application\dto\RendezVousDTO;
-
 class AnnulerRendezVousAction {
     
     private ServiceRendezVousInterface $serviceRendezVous;
@@ -28,17 +26,11 @@ class AnnulerRendezVousAction {
         $id = $args['id'] ?? null;
 
         if ($id === null || $id === '') {
-            throw new HttpBadRequestException(
-                $rq,
-                "L'ID du rendez-vous est requis."
-            );
+            throw new HttpBadRequestException($rq, "L'ID du rendez-vous est requis.");
         }
 
         if (!is_string($id)) {
-            throw new HttpBadRequestException(
-                $rq,
-                "L'ID du rendez-vous doit être une chaîne de caractères."
-            );
+            throw new HttpBadRequestException($rq, "L'ID du rendez-vous doit être une chaîne de caractères.");
         }
 
         try {
