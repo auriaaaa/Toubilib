@@ -6,7 +6,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 use toubilib\adapters\config\ContainerConfig;
 use toubilib\adapters\controllers\middlewares\Cors;
+
+// Actions 
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
+use toubilib\adapters\controllers\actions\GetPraticienAction;
+use toubilib\adapters\controllers\actions\GetAllPraticienAction;
 
 $dotenv = \Dotenv\Dotenv::createImmutable(
     __DIR__ . '/../../',
@@ -36,7 +40,15 @@ $errorHandler->registerErrorRenderer(
 $app->group('/rdv', function (\Slim\Routing\RouteCollectorProxy $group) {
 
     // Annuler un rendez-vous
-    $group->post('/{id}/annuler', AnnulerRendezVousAction::class )->setName('AnnulerRendezVous');
+    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class )->setName('AnnulerRendezVous');
+
+});
+
+$app->group('/praticiens', function (\Slim\Routing\RouteCollectorProxy $group) {
+
+    // Get
+    $group->get('[/]', GetAllPraticienAction::class )->setName('GetAllPraticiens');
+    $group->get('/{id}[/]', GetPraticienAction::class )->setName('GetPraticien');
 
 });
 
