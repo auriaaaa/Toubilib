@@ -19,7 +19,11 @@ class ServiceRendezVous implements ServiceRendezVousInterface
 
     public function annuler(string $id): RendezVousDTO
     {
-        $rendezVous = $this->rendezVousRepository->findById($id);
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (RendezVousNotFoundException $e) {
+            throw new RendezVousNotFoundException("Aucun Rendez-vous trouvé avec l'ID : $id");
+        }
 
         $rendezVous->annuler();
 
