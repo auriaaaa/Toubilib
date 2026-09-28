@@ -17,12 +17,23 @@ class ServiceRendezVous implements ServiceRendezVousInterface
         $this->rendezVousRepository = $rendezVousRepository;
     }
 
+    public function getRendezVous(string $id): RendezVousDTO
+    {
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
+        }
+
+        return RendezVousDTO::fromEntity($rendezVous);
+    }
+
     public function annuler(string $id): RendezVousDTO
     {
         try {
             $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (RendezVousNotFoundException $e) {
-            throw new RendezVousNotFoundException("Aucun Rendez-vous trouvé avec l'ID : $id");
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun Rendez-vous trouvé avec l'ID : $id");
         }
 
         $rendezVous->annuler();

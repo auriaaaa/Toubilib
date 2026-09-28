@@ -8,5 +8,7 @@ use toubilib\application\dto\RendezVousDTO;
 
 interface ServiceRendezVousInterface
 {
+    public function getRendezVous(string $id): RendezVousDTO;
+    
     public function annuler(string $id): RendezVousDTO;
 }
