@@ -7,23 +7,16 @@ use DateTime;
 use toubilib\domain\exceptions\RendezVousDejaPasseException;
 use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 
-enum Duree: int
-{
-    case CI = 30;
-    case C0 = 20;
-    case CS = 15;
-}
-
 class RendezVous
 {
     private string $id;
     private string $praticien_id;
     private string $patient_id;
     private DateTime $date_heure_debut;
-    private DateTime $date_heure_fin;   // selon la durée du rendez-vous
+    private DateTime $date_heure_fin;
     private DateTime $date_creation;    
-    private int $statut;
-    private int $duree;                 // selon le motif de visite
+    private int $statut;               
+    private int $duree;                 
     private string $motif_visite; 
 
     public function __construct(
@@ -31,21 +24,21 @@ class RendezVous
         string $praticien_id,
         string $patient_id,
         DateTime $date_heure_debut,
+        DateTime $date_heure_fin,
         DateTime $date_creation,
-        int $statut,
+        string $statut,
+        int $duree,
         string $motif_visite,
     ) {
         $this->id = $id;
         $this->praticien_id = $praticien_id;
         $this->patient_id = $patient_id;
         $this->date_heure_debut = $date_heure_debut;
+        $this->date_heure_fin = $date_heure_fin;
         $this->date_creation = $date_creation;
         $this->statut = $statut;
+        $this->duree = $duree;
         $this->motif_visite = $motif_visite;
-
-        $this->duree = Duree::CI->value;
-        $this->date_heure_fin = (clone $date_heure_debut)
-            ->modify("+{$this->duree} minutes");
     }
 
     public function getId(): string { return $this->id; }
@@ -57,7 +50,45 @@ class RendezVous
     public function getStatut(): int { return $this->statut; }
     public function getDuree(): int { return $this->duree; }
     public function getMotifVisite(): string { return $this->motif_visite; }
+    
+    public static function creer(
+        Praticien $praticien,
+        Patient $patient,
+        DateTime $date_heure_debut,
+        string $motif_visite,
+        ?DateTime $maintenant = null
+    ): RendezVous{
 
+        $maintenant = $maintenant ?? new DateTime();
+
+        $praticien->verifierMotif($motif_visite);
+        $duree = $praticien->duree($motif_visite);
+
+        $debut = clone $date_heure_debut;
+        if ($debut < $maintenant) {
+            throw new \InvalidArgumentException("La date et l'heure de début du rendez-vous ne peuvent pas être dans le passé.");
+        }
+        $praticien->rdvPossible($debut, $duree);
+
+        $fin = (clone $debut)->modify("+{$duree} minutes");
+
+        $rendezVous = new self(
+            uniqid(),
+            $praticien->getId(),
+            $patient->getId(),
+            $debut,
+            $fin,
+            clone $maintenant,
+            0,
+            $duree,
+            $motif_visite
+        );
+
+        $praticien->verifierDisponibilite($rendezVous);
+
+        return $rendezVous;
+
+    }
 
     public function annuler(): void
     {
@@ -75,6 +106,12 @@ class RendezVous
             throw new StatutRendezVousInvalideException("Statut de rendez-vous invalide.");
         }
                
+    }
+
+    public function chevauche(RendezVous $rdv): bool
+    {
+        return $this->date_heure_debut < $rdv->date_heure_fin
+            && $rdv->date_heure_debut < $this->date_heure_fin;
     }
 
 }
