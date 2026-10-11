@@ -11,6 +11,9 @@ use toubilib\application\usecases\ServiceRendezVous;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 
 use toubilib\adapters\persistence\PraticienRepository;
+use toubilib\adapters\persistence\PatientRepository;
+use toubilib\application\ports\spi\PatientRepositoryInterface;
+use toubilib\application\validators\CreateRendezVousValidator;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\usecases\ServicePraticien;
 use toubilib\application\ports\api\ServicePraticienInterface;
@@ -26,7 +29,21 @@ final class ContainerConfig
             ServiceRendezVousInterface::class =>
                 \DI\create(ServiceRendezVous::class)
                     ->constructor(
-                        \DI\get(RendezVousRepositoryInterface::class)
+                        \DI\get(RendezVousRepositoryInterface::class),
+                        \DI\get(CreateRendezVousValidator::class)
+                    ),
+
+            CreateRendezVousValidator::class =>
+                \DI\create(CreateRendezVousValidator::class)
+                    ->constructor(
+                        \DI\get(PraticienRepositoryInterface::class),
+                        \DI\get(PatientRepositoryInterface::class)
+                    ),
+
+            PatientRepositoryInterface::class =>
+                \DI\create(PatientRepository::class)
+                    ->constructor(
+                        \DI\get('toubilib.pdo')
                     ),
 
             RendezVousRepositoryInterface::class =>
