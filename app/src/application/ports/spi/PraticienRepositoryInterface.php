@@ -9,5 +9,9 @@ interface PraticienRepositoryInterface
 
     public function findById(string $id): Praticien;
 
+    public function findByIdAvecRendezVous(string $id, DateTime $debut, DateTime $fin): Praticien;
+
     public function findAll(): array;
+
+    public function existe(string $id): bool;
 } 
