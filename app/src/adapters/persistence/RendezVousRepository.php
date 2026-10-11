@@ -55,8 +55,10 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
             $data['praticien_id'],
             $data['patient_id'],
             new \DateTime($data['date_heure_debut']),
+            new \DateTime($data['date_heure_fin']),
             new \DateTime($data['date_creation']),
             (int)$data['statut'],
+            (int)$data['duree'],
             $data['motif_visite']
         );
     }
