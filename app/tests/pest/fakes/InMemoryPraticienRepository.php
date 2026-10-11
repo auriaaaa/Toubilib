@@ -9,6 +9,11 @@ class InMemoryPraticienRepository implements PraticienRepositoryInterface
 {
     private array $praticiens = [];
 
+    public function ajouter(string $id): void
+    {
+        $this->ids[$id] = true;
+    }
+
     public function save(Praticien $praticien): void
     {
         $this->praticiens[$praticien->getId()] = $praticien;
