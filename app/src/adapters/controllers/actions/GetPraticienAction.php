@@ -38,7 +38,25 @@ class GetPraticienAction {
             throw new HttpNotFoundException($rq, "Praticien non trouvé.");
         }
 
-        $rs->getBody()->write(json_encode($praticien_dto));
+        $data = [
+            'praticien' => $praticien_dto,
+            '_links' => [
+                'self' => [
+                    'href' => '/praticiens/' . $id,
+                    'method' => 'GET'
+                ],
+                'all' => [
+                    'href' => '/praticiens',
+                    'method' => 'GET'
+                ],
+                'creneaux' => [
+                    'href' => '/praticiens/' . $id . '/creneaux-occupes',
+                    'method' => 'GET'
+                ]
+            ]
+        ];
+
+        $rs->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         return $rs
             ->withHeader('Content-Type', 'application/json')
