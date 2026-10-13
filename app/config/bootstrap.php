@@ -8,6 +8,7 @@ use toubilib\adapters\config\ContainerConfig;
 use toubilib\adapters\controllers\middlewares\Cors;
 
 // Actions 
+use toubilib\adapters\controllers\actions\CreerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetRendezVousAction;
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetPraticienAction;
@@ -38,10 +39,13 @@ $errorHandler->registerErrorRenderer(
     }
 );
 
-$app->group('/rdv', function (\Slim\Routing\RouteCollectorProxy $group) {
+$app->group('/rendezvous', function (\Slim\Routing\RouteCollectorProxy $group) {
+
+    // Créer un rendez-vous
+    $group->post('[/]', CreerRendezVousAction::class )->setName('CreerRendezVous');
 
     // Annuler un rendez-vous
-    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class )->setName('Annuler3RendezVous');
+    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class )->setName('AnnulerRendezVous');
 
     // Get
     $group->get('/{id}[/]', GetRendezVousAction::class )->setName('GetRendezVous');
