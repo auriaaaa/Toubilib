@@ -30,6 +30,8 @@ final class ContainerConfig
                 \DI\create(ServiceRendezVous::class)
                     ->constructor(
                         \DI\get(RendezVousRepositoryInterface::class),
+                        \DI\get(PraticienRepositoryInterface::class),
+                        \DI\get(PatientRepositoryInterface::class),
                         \DI\get(CreateRendezVousValidator::class)
                     ),
 
