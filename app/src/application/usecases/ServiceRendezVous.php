@@ -33,7 +33,7 @@ class ServiceRendezVous implements ServiceRendezVousInterface
         $this->patientRepository = $patientRepository;
         $this->validator = $validator;
     }
-
+    
     public function getRendezVous(string $id): RendezVousDTO
     {
         try {
@@ -41,21 +41,6 @@ class ServiceRendezVous implements ServiceRendezVousInterface
         } catch (\Exception $e) {
             throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
         }
-
-        return RendezVousDTO::fromEntity($rendezVous);
-    }
-
-    public function annuler(string $id): RendezVousDTO
-    {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun Rendez-vous trouvé avec l'ID : $id");
-        }
-
-        $rendezVous->annuler();
-
-        $this->rendezVousRepository->save($rendezVous);
 
         return RendezVousDTO::fromEntity($rendezVous);
     }
@@ -77,6 +62,63 @@ class ServiceRendezVous implements ServiceRendezVousInterface
         } catch (PraticienIndisponibleException $e) {
             throw new ValidationException(['date_heure_debut' => $e->getMessage()]);
         }
+
+        $this->rendezVousRepository->save($rendezVous);
+
+        return RendezVousDTO::fromEntity($rendezVous);
+    }
+
+    public function annuler(string $id): RendezVousDTO
+    {
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun Rendez-vous trouvé avec l'ID : $id");
+        }
+
+        $rendezVous->annuler();
+
+        $this->rendezVousRepository->save($rendezVous);
+
+        return RendezVousDTO::fromEntity($rendezVous);
+    }
+
+
+    public function statutModifiable(string $id): bool
+    {
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
+        }
+
+        return $rendezVous->statutModifiable();
+    }
+
+    public function honorer(string $id): RendezVousDTO
+    {
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
+        }
+
+        $rendezVous->honorer();
+
+        $this->rendezVousRepository->save($rendezVous);
+
+        return RendezVousDTO::fromEntity($rendezVous);
+    }
+
+    public function ignorer(string $id): RendezVousDTO
+    {
+        try {
+            $rendezVous = $this->rendezVousRepository->findById($id);
+        } catch (\Exception $e) {
+            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
+        }
+
+        $rendezVous->ignorer();
 
         $this->rendezVousRepository->save($rendezVous);
 
