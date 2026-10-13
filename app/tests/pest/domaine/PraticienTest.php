@@ -219,3 +219,113 @@ it('refuses a request overlapping an appointment that was already honoured', fun
     expect(fn () => $this->praticien->verifierDisponibilite($demande))
         ->toThrow(PraticienIndisponibleException::class);
 });
+
+
+// ------------------------------------------------------------ getRendezVousPourPeriode()
+
+it('returns appointments within the requested period', function () {
+    $rdv1 = ($this->rdv)('next monday 10:00');
+    $rdv2 = ($this->rdv)('next monday 11:00');
+    $rdv3 = ($this->rdv)('next tuesday 10:00');
+
+    $this->praticien->ajouterRendezVous($rdv1);
+    $this->praticien->ajouterRendezVous($rdv2);
+    $this->praticien->ajouterRendezVous($rdv3);
+
+    $debut = new DateTime('next monday 09:00');
+    $fin = new DateTime('next monday 12:00');
+
+    $resultat = $this->praticien->getRendezVousPourPeriode($debut, $fin);
+
+    expect($resultat)->toHaveCount(2)
+        ->and($resultat[0])->toBe($rdv1)
+        ->and($resultat[1])->toBe($rdv2);
+});
+
+it('includes an appointment overlapping the beginning of the period', function () {
+    $rdv = ($this->rdv)('next monday 08:45', 30);
+
+    $this->praticien->ajouterRendezVous($rdv);
+
+    $resultat = $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next monday 09:00'),
+        new DateTime('next monday 10:00')
+    );
+
+    expect($resultat)->toHaveCount(1)
+        ->and($resultat[0])->toBe($rdv);
+});
+
+it('includes an appointment overlapping the end of the period', function () {
+    $rdv = ($this->rdv)('next monday 11:45', 30);
+
+    $this->praticien->ajouterRendezVous($rdv);
+
+    $resultat = $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next monday 10:00'),
+        new DateTime('next monday 12:00')
+    );
+
+    expect($resultat)->toHaveCount(1)
+        ->and($resultat[0])->toBe($rdv);
+});
+
+it('excludes appointments outside the requested period', function () {
+    $avant = ($this->rdv)('next monday 08:00', 30);
+    $apres = ($this->rdv)('next monday 12:00', 30);
+
+    $this->praticien->ajouterRendezVous($avant);
+    $this->praticien->ajouterRendezVous($apres);
+
+    $resultat = $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next monday 09:00'),
+        new DateTime('next monday 12:00')
+    );
+
+    expect($resultat)->toBe([]);
+});
+
+it('excludes cancelled appointments', function () {
+    $annule = ($this->rdv)('next monday 10:00', 30, 1);
+    $actif = ($this->rdv)('next monday 11:00', 30, 0);
+
+    $this->praticien->ajouterRendezVous($annule);
+    $this->praticien->ajouterRendezVous($actif);
+
+    $resultat = $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next monday 09:00'),
+        new DateTime('next monday 12:00')
+    );
+
+    expect($resultat)->toHaveCount(1)
+        ->and($resultat[0])->toBe($actif);
+});
+
+it('returns an empty list when no appointments overlap the period', function () {
+    $this->praticien->ajouterRendezVous(
+        ($this->rdv)('next monday 10:00')
+    );
+
+    $resultat = $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next tuesday 09:00'),
+        new DateTime('next tuesday 12:00')
+    );
+
+    expect($resultat)->toBe([]);
+});
+
+it('refuses a period whose start is after its end', function () {
+    expect(fn () => $this->praticien->getRendezVousPourPeriode(
+        new DateTime('next monday 12:00'),
+        new DateTime('next monday 09:00')
+    ))->toThrow(InvalidArgumentException::class);
+});
+
+it('refuses a period whose start equals its end', function () {
+    $date = new DateTime('next monday 10:00');
+
+    expect(fn () => $this->praticien->getRendezVousPourPeriode(
+        $date,
+        clone $date
+    ))->toThrow(InvalidArgumentException::class);
+});
