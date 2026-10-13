@@ -23,12 +23,17 @@ beforeEach(function () {
 
     $this->validator = new CreateRendezVousValidator($praticiens, $patients);
 
-    $this->dto = fn (array $champs = []) => CreateRendezVousDTO::fromArray(array_merge([
-        'praticien_id' => 'praticien-uuid-1',
-        'patient_id' => 'patient-uuid-1',
-        'date_heure_debut' => 'next monday 10:00',
-        'motif_visite' => 'CI',
-    ], $champs));
+   $this->dto = function (array $champs = []) {
+        $donnees = array_merge([
+            'praticien_id' => 'praticien-uuid-1',
+            'patient_id' => 'patient-uuid-1',
+            'date_heure_debut' => 'next monday 10:00',
+            'motif_visite' => 'CI',
+        ], $champs);
+        $donnees['date_heure_debut'] = (new DateTime($donnees['date_heure_debut']))->format('Y-m-d\TH:i:s');
+
+        return CreateRendezVousDTO::fromArray($donnees);
+    };
 });
 
 it('accepts a request when the praticien and the patient exist', function () {
