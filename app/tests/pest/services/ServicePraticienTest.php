@@ -1,5 +1,8 @@
 <?php
 
+use DateTime;
+use InvalidArgumentException;
+use toubilib\domain\entities\RendezVous;
 use toubilib\application\usecases\ServicePraticien;
 use toubilib\domain\entities\Praticien;
 use tests\pest\fakes\InMemoryPraticienRepository;
@@ -37,7 +40,7 @@ function makeServicePraticien(array $praticiens = []): ServicePraticien {
     return new ServicePraticien($repository);
 }
 
-// ------------------------------------------------------------ Tests
+// ------------------------------------------------------------ getPraticien()
 
 it('should return a practitioner DTO by id', function () {
 
@@ -67,6 +70,8 @@ it('should throw an exception when practitioner does not exist', function () {
         'Aucun praticien trouvé avec l\'ID : 00000000-0000-0000-0000-000000000000'
     );
 });
+
+// ------------------------------------------------------------ getAllPraticiens()
 
 it('should return all practitioners as DTOs', function () {
 
@@ -114,4 +119,102 @@ it('should return an empty array when there are no practitioners', function () {
 
     expect($service->getAllPraticiens())
         ->toBe([]);
+});
+
+// ------------------------------------------------------------ getCreneauxOccupes()
+
+it('should return occupied appointments for a practitioner during a period', function () {
+    $praticien = makePraticien();
+
+    $rdv1 = new RendezVous(
+        'rdv-1',
+        PRATICIEN_UUID,
+        'patient-1',
+        new DateTime('next monday 10:00'),
+        new DateTime('next monday 10:30'),
+        new DateTime('now'),
+        0,
+        30,
+        'CI'
+    );
+
+    $rdv2 = new RendezVous(
+        'rdv-2',
+        PRATICIEN_UUID,
+        'patient-2',
+        new DateTime('next monday 11:00'),
+        new DateTime('next monday 11:30'),
+        new DateTime('now'),
+        0,
+        30,
+        'CS'
+    );
+
+    $praticien->ajouterRendezVous($rdv1);
+    $praticien->ajouterRendezVous($rdv2);
+
+    $repository = new InMemoryPraticienRepository();
+    $repository->save($praticien);
+
+    $service = new ServicePraticien($repository);
+
+    $result = $service->getCreneauxOccupes(
+        PRATICIEN_UUID,
+        new DateTime('next monday 09:00'),
+        new DateTime('next monday 12:00')
+    );
+
+    expect($result)
+        ->toHaveCount(2)
+        ->and($result[0])->toBe($rdv1)
+        ->and($result[1])->toBe($rdv2);
+});
+
+it('should return an empty array when there are no occupied appointments', function () {
+    $praticien = makePraticien();
+
+    $repository = new InMemoryPraticienRepository();
+    $repository->save($praticien);
+
+    $service = new ServicePraticien($repository);
+
+    $result = $service->getCreneauxOccupes(
+        PRATICIEN_UUID,
+        new DateTime('next monday 09:00'),
+        new DateTime('next monday 12:00')
+    );
+
+    expect($result)->toBe([]);
+});
+
+it('should throw an exception when the start date is after the end date', function () {
+    $service = makeServicePraticien([
+        makePraticien()
+    ]);
+
+    expect(fn () => $service->getCreneauxOccupes(
+        PRATICIEN_UUID,
+        new DateTime('next monday 12:00'),
+        new DateTime('next monday 09:00')
+    ))->toThrow(
+        InvalidArgumentException::class,
+        'La date de début doit précéder la date de fin.'
+    );
+});
+
+it('should throw an exception when the start date equals the end date', function () {
+    $service = makeServicePraticien([
+        makePraticien()
+    ]);
+
+    $date = new DateTime('next monday 10:00');
+
+    expect(fn () => $service->getCreneauxOccupes(
+        PRATICIEN_UUID,
+        $date,
+        clone $date
+    ))->toThrow(
+        InvalidArgumentException::class,
+        'La date de début doit précéder la date de fin.'
+    );
 });

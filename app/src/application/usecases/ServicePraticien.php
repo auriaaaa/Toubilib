@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace toubilib\application\usecases;
 
+use DateTime;
 use toubilib\application\ports\api\ServicePraticienInterface;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\dto\PraticienDTO;
@@ -32,6 +33,23 @@ class ServicePraticien implements ServicePraticienInterface
     {
         $praticiens = $this->praticienRepository->findAll();
         return array_map([PraticienDTO::class, 'fromEntity'], $praticiens);
+    }
+    
+    public function getCreneauxOccupes(
+        string $praticienId,
+        DateTime $debut,
+        DateTime $fin
+    ): array {
+        if ($debut >= $fin) {
+            throw new \InvalidArgumentException(
+                "La date de début doit précéder la date de fin."
+            );
+        }
+
+        $praticien = $this->praticienRepository
+            ->findByIdAvecRendezVous($praticienId, $debut, $fin);
+
+        return $praticien->getRendezVousPourPeriode($debut, $fin);
     }
 }
 
