@@ -1,6 +1,7 @@
 <?php
 namespace toubilib\application\ports\spi;
 
+use DateTime;
 use toubilib\domain\entities\Praticien;
 
 interface PraticienRepositoryInterface
