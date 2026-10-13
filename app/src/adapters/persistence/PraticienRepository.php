@@ -91,7 +91,19 @@ class PraticienRepository implements PraticienRepositoryInterface {
         ]);
 
         while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $praticien->ajouterRendezVous(RendezVousRepository::hydrate($data));
+            $rdv = new RendezVous(
+                $data['id'],
+                $data['praticien_id'],
+                $data['patient_id'],
+                new DateTime($data['date_heure_debut']),
+                new DateTime($data['date_heure_fin']),
+                new DateTime($data['date_creation']),
+                (int) $data['statut'],
+                (int) $data['duree'],
+                $data['motif_visite']
+            );
+
+            $praticien->ajouterRendezVous($rdv);
         }
 
         return $praticien;
