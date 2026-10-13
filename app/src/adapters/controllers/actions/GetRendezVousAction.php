@@ -34,11 +34,39 @@ class GetRendezVousAction {
 
         try {
             $rendezVous_dto = $this->serviceRendezVous->getRendezVous($id);
+            $est_modifiable = $this->serviceRendezVous->statutModifiable($id);
         } catch (\Exception $e) {
             throw new HttpNotFoundException($rq, "Rendez-vous non trouvé.");
         }
 
-        $rs->getBody()->write(json_encode($rendezVous_dto));
+        $data = [
+            'rendezVous' => $rendezVous_dto,
+            '_links' => [
+                'self' => [
+                    'href' => '/rendezvous/' . $id,
+                    'method' => 'GET'
+                ]
+            ]
+        ];
+
+        if ($est_modifiable) {
+            $data['_links']['annuler'] = [
+                'href' => '/rendezvous/' . $id . '/annuler',
+                'method' => 'POST'
+            ];
+
+            $data['_links']['honorer'] = [
+                'href' => '/rendezvous/' . $id . '/honorer',
+                'method' => 'POST'
+            ];
+
+            $data['_links']['ignorer'] = [
+                'href' => '/rendezvous/' . $id . '/ignorer',
+                'method' => 'POST'
+            ];
+        }
+
+        $rs->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         return $rs
             ->withHeader('Content-Type', 'application/json')
