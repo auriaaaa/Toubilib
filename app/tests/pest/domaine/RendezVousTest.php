@@ -4,6 +4,9 @@ use toubilib\domain\entities\Patient;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\entities\RendezVous;
 use toubilib\domain\exceptions\PraticienIndisponibleException;
+use toubilib\domain\exceptions\RendezVousPasPasseException;
+use toubilib\domain\exceptions\RendezVousDejaPasseException;
+use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 
 const RDV_UUID = '5105e114-4299-338e-a389-bfa83f2109c4';
 
@@ -253,4 +256,115 @@ it('detects an appointment fully containing another one', function () {
 
     expect($long->chevauche($court))->toBeTrue()
         ->and($court->chevauche($long))->toBeTrue();
+});
+
+// ------------------------------------------------------------ honorer()
+it('honours a past appointment with status 0', function () {
+    $rdv = makeRendezVous(0, new DateTime('-1 day'));
+
+    $rdv->honorer();
+
+    expect($rdv->getStatut())->toBe(2);
+});
+
+it('does not honour a future appointment', function () {
+    $rdv = makeRendezVous(0, new DateTime('+1 day'));
+
+    expect(fn () => $rdv->honorer())
+        ->toThrow(RendezVousPasPasseException::class);
+
+    expect($rdv->getStatut())->toBe(0);
+});
+
+it('does not honour an already cancelled appointment', function () {
+    $rdv = makeRendezVous(1, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->honorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+it('does not honour an already honoured appointment', function () {
+    $rdv = makeRendezVous(2, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->honorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+it('does not honour an already ignored appointment', function () {
+    $rdv = makeRendezVous(3, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->honorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+
+// ------------------------------------------------------------ ignorer()
+it('ignores a past appointment with status 0', function () {
+    $rdv = makeRendezVous(0, new DateTime('-1 day'));
+
+    $rdv->ignorer();
+
+    expect($rdv->getStatut())->toBe(3);
+});
+
+it('does not ignore a future appointment', function () {
+    $rdv = makeRendezVous(0, new DateTime('+1 day'));
+
+    expect(fn () => $rdv->ignorer())
+        ->toThrow(RendezVousPasPasseException::class);
+
+    expect($rdv->getStatut())->toBe(0);
+});
+
+it('does not ignore an already cancelled appointment', function () {
+    $rdv = makeRendezVous(1, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->ignorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+it('does not ignore an already honoured appointment', function () {
+    $rdv = makeRendezVous(2, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->ignorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+it('does not ignore an already ignored appointment', function () {
+    $rdv = makeRendezVous(3, new DateTime('-1 day'));
+
+    expect(fn () => $rdv->ignorer())
+        ->toThrow(StatutRendezVousInvalideException::class);
+});
+
+
+// ------------------------------------------------------------ statutModifiable()
+it('considers an appointment with status 0 modifiable', function () {
+    $rdv = makeRendezVous(0);
+
+    expect($rdv->statutModifiable())->toBeTrue();
+});
+
+it('considers an appointment with status 1 not modifiable', function () {
+    $rdv = makeRendezVous(1);
+
+    expect($rdv->statutModifiable())->toBeFalse();
+});
+
+it('considers an appointment with status 2 not modifiable', function () {
+    $rdv = makeRendezVous(2);
+
+    expect($rdv->statutModifiable())->toBeFalse();
+});
+
+it('considers an appointment with status 3 not modifiable', function () {
+    $rdv = makeRendezVous(3);
+
+    expect($rdv->statutModifiable())->toBeFalse();
+});
+
+it('considers an appointment with an unknown status not modifiable', function () {
+    $rdv = makeRendezVous(99);
+
+    expect($rdv->statutModifiable())->toBeFalse();
 });

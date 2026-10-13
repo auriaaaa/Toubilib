@@ -4,6 +4,7 @@ namespace toubilib\domain\entities;
 
 use DateTime;
 
+use toubilib\domain\exceptions\RendezVousPasPasseException;
 use toubilib\domain\exceptions\RendezVousDejaPasseException;
 use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 
@@ -26,7 +27,7 @@ class RendezVous
         DateTime $date_heure_debut,
         DateTime $date_heure_fin,
         DateTime $date_creation,
-        string $statut,
+        int $statut,
         int $duree,
         string $motif_visite,
     ) {
@@ -96,7 +97,7 @@ class RendezVous
             throw new RendezVousDejaPasseException("Le rendez-vous est déjà passé et ne peut pas être annulé.");
         }
 
-        if ($this->statut === 0) {
+        if ($this->statutModifiable()) {
             $this->statut = 1; 
         } elseif ($this->statut === 1) {
             throw new StatutRendezVousInvalideException("Le rendez-vous est déjà annulé.");
@@ -106,6 +107,49 @@ class RendezVous
             throw new StatutRendezVousInvalideException("Statut de rendez-vous invalide.");
         }
                
+    }
+
+    public function statutModifiable(): bool
+    {
+        return $this->statut === 0;
+    }
+
+    public function honorer(): void
+    {
+        if ($this->date_heure_debut > new DateTime()) {
+            throw new RendezVousPasPasseException("Le rendez-vous n'est pas encore passé et ne peut pas être honoré.");
+        }
+
+        if ($this->statutModifiable()) {
+            $this->statut = 2; 
+        } elseif ($this->statut === 1) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est annulé et ne peut pas être honoré.");
+        } elseif ($this->statut === 2) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est déjà honoré.");
+        } elseif ($this->statut === 3) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est déjà ignoré et ne peut pas être honoré.");
+        } else {
+            throw new StatutRendezVousInvalideException("Statut de rendez-vous invalide.");
+        }
+    }
+
+    public function ignorer(): void
+    {
+        if ($this->date_heure_debut > new DateTime()) {
+            throw new RendezVousPasPasseException("Le rendez-vous n'est pas encore passé et ne peut pas être ignoré.");
+        }
+
+        if ($this->statutModifiable()) {
+            $this->statut = 3; 
+        } elseif ($this->statut === 1) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est annulé et ne peut pas être ignoré.");
+        } elseif ($this->statut === 2) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est honoré et ne peut pas être ignoré.");
+        } elseif ($this->statut === 3) {
+            throw new StatutRendezVousInvalideException("Le rendez-vous est déjà ignoré.");
+        } else {
+            throw new StatutRendezVousInvalideException("Statut de rendez-vous invalide.");
+        }
     }
 
     public function chevauche(RendezVous $rdv): bool
