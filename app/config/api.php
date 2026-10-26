@@ -15,19 +15,21 @@ use toubilib\adapters\controllers\actions\GetAllPraticienAction;
 use toubilib\adapters\controllers\actions\GetCreneauxOccupesPraticienAction;
 use toubilib\adapters\controllers\actions\GetPraticienAgendaAction;
 
-// Charger la configuration puis construire les services.
-require_once __DIR__ . '/settings.php';
+$settings = require __DIR__ . '/settings.php';
 $container = require __DIR__ . '/services.php';
 
-// Initialisation de Slim.
+// Initialisation de Slim
 $app = AppFactory::createFromContainer($container);
+
+// Middlewares
 $app->addBodyParsingMiddleware();
-$app->add(Cors::class);
 $app->addRoutingMiddleware();
 
+// Gestion des erreurs
 $errorMiddleware = $app->addErrorMiddleware(true, false, false);
 $errorHandler = $errorMiddleware->getDefaultErrorHandler();
 $errorHandler->forceContentType('application/json');
+
 $errorHandler->registerErrorRenderer(
     'application/json',
     function ($exception, $displayErrorDetails) {
@@ -36,6 +38,9 @@ $errorHandler->registerErrorRenderer(
         ]);
     }
 );
+
+// CORS
+$app->add(Cors::class);
 
 // Routes des rendez-vous.
 $app->group('/rendezvous', function (\Slim\Routing\RouteCollectorProxy $group) {
