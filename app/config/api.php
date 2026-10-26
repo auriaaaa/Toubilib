@@ -3,25 +3,23 @@
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
-use toubilib\adapters\config\ContainerConfig;
 use toubilib\adapters\controllers\middlewares\Cors;
 
-// Actions 
 use toubilib\adapters\controllers\actions\CreerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetRendezVousAction;
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
+use toubilib\adapters\controllers\actions\HonorerRendezVousAction;
+use toubilib\adapters\controllers\actions\IgnorerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetPraticienAction;
 use toubilib\adapters\controllers\actions\GetAllPraticienAction;
+use toubilib\adapters\controllers\actions\GetCreneauxOccupesPraticienAction;
+use toubilib\adapters\controllers\actions\GetPraticienAgendaAction;
 
-$dotenv = \Dotenv\Dotenv::createImmutable(
-    __DIR__ . '/../../',
-    'toubilib.env'
-);
-$dotenv->load();
+// Charger la configuration puis construire les services.
+require_once __DIR__ . '/settings.php';
+$container = require __DIR__ . '/services.php';
 
-$container = ContainerConfig::build();
-
+// Initialisation de Slim.
 $app = AppFactory::createFromContainer($container);
 $app->addBodyParsingMiddleware();
 $app->add(Cors::class);
@@ -39,25 +37,21 @@ $errorHandler->registerErrorRenderer(
     }
 );
 
+// Routes des rendez-vous.
 $app->group('/rendezvous', function (\Slim\Routing\RouteCollectorProxy $group) {
-
-    // Créer un rendez-vous
-    $group->post('[/]', CreerRendezVousAction::class )->setName('CreerRendezVous');
-
-    // Annuler un rendez-vous
-    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class )->setName('AnnulerRendezVous');
-
-    // Get
-    $group->get('/{id}[/]', GetRendezVousAction::class )->setName('GetRendezVous');
-
+    $group->post('[/]', CreerRendezVousAction::class);
+    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class);
+    $group->post('/{id}/honorer[/]', HonorerRendezVousAction::class);
+    $group->post('/{id}/ignorer[/]', IgnorerRendezVousAction::class);
+    $group->get('/{id}[/]', GetRendezVousAction::class);
 });
 
+// Routes des praticiens.
 $app->group('/praticiens', function (\Slim\Routing\RouteCollectorProxy $group) {
-
-    // Get
-    $group->get('[/]', GetAllPraticienAction::class )->setName('GetAllPraticiens');
-    $group->get('/{id}[/]', GetPraticienAction::class )->setName('GetPraticien');
-
+    $group->get('[/]', GetAllPraticienAction::class);
+    $group->get('/{id}[/]', GetPraticienAction::class);
+    $group->get('/{id}/agenda[/]', GetPraticienAgendaAction::class);
+    $group->get('/{id}/creneaux-occupes', GetCreneauxOccupesPraticienAction::class);
 });
 
 $app->options(
