@@ -49,6 +49,10 @@ class GetPraticienAction {
                     'href' => '/praticiens',
                     'method' => 'GET'
                 ],
+                'agenda' => [
+                    'href' => '/praticiens/' . $id . '/agenda',
+                    'method' => 'GET'
+                ],
                 'creneaux' => [
                     'href' => '/praticiens/' . $id . '/creneaux-occupes',
                     'method' => 'GET'
