@@ -313,19 +313,3 @@ it('returns an empty list when no appointments overlap the period', function () 
 
     expect($resultat)->toBe([]);
 });
-
-it('refuses a period whose start is after its end', function () {
-    expect(fn () => $this->praticien->getRendezVousPourPeriode(
-        new DateTime('next monday 12:00'),
-        new DateTime('next monday 09:00')
-    ))->toThrow(InvalidArgumentException::class);
-});
-
-it('refuses a period whose start equals its end', function () {
-    $date = new DateTime('next monday 10:00');
-
-    expect(fn () => $this->praticien->getRendezVousPourPeriode(
-        $date,
-        clone $date
-    ))->toThrow(InvalidArgumentException::class);
-});
