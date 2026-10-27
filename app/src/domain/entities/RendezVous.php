@@ -20,6 +20,9 @@ class RendezVous
     private int $duree;                 
     private string $motif_visite; 
 
+    private ?string $patientNom = null;
+    private ?string $patientPrenom = null;
+
     public function __construct(
         string $id,
         string $praticien_id,
@@ -51,6 +54,16 @@ class RendezVous
     public function getStatut(): int { return $this->statut; }
     public function getDuree(): int { return $this->duree; }
     public function getMotifVisite(): string { return $this->motif_visite; }
+
+    public function getPatientNom(): ?string { return $this->patientNom; }
+
+    public function getPatientPrenom(): ?string { return $this->patientPrenom; }
+
+    public function setInformationsPatient(?string $nom, ?string $prenom): void
+    {
+        $this->patientNom = $nom;
+        $this->patientPrenom = $prenom;
+    }
     
     public static function creer(
         Praticien $praticien,

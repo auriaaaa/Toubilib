@@ -136,18 +136,18 @@ class Praticien
         DateTime $debut,
         DateTime $fin
     ): array {
-        if ($debut >= $fin) {
-            throw new \InvalidArgumentException(
-                "La date de début doit précéder la date de fin."
-            );
-        }
+        $rendezVousFiltres = [];
 
-        return array_values(array_filter(
-            $this->rendezVous,
-            fn (RendezVous $rdv): bool =>
+        foreach ($this->rendezVous as $rdv) {
+            if (
                 $rdv->getDateHeureDebut() < $fin
                 && $rdv->getDateHeureFin() > $debut
                 && $rdv->getStatut() !== 1
-        ));
+            ) {
+                $rendezVousFiltres[] = $rdv;
+            }
+        }
+
+        return $rendezVousFiltres;
     }
 }

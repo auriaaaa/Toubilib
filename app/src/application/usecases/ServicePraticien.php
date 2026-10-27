@@ -35,15 +35,13 @@ class ServicePraticien implements ServicePraticienInterface
         return array_map([PraticienDTO::class, 'fromEntity'], $praticiens);
     }
     
-    public function getCreneauxOccupes(
+    public function getRendezVousPourPeriode(
         string $praticienId,
         DateTime $debut,
         DateTime $fin
     ): array {
         if ($debut >= $fin) {
-            throw new \InvalidArgumentException(
-                "La date de début doit précéder la date de fin."
-            );
+            throw new \InvalidArgumentException("La date de début doit précéder la date de fin.");
         }
 
         $praticien = $this->praticienRepository

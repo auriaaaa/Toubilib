@@ -32,18 +32,14 @@ class GetCreneauxOccupesPraticienAction
             $debut = new DateTime($params['debut']);
             $fin = new DateTime($params['fin']);
 
-            $rendezVous = $this->servicePraticien->getCreneauxOccupes(
-                $args['id'],
-                $debut,
-                $fin
-            );
+            $rendezVous = $this->servicePraticien->getRendezVousPourPeriode($args['id'], $debut, $fin);
 
             $creneaux = [];
 
             foreach ($rendezVous as $rdv) {
                 $creneaux[] = [
-                    'debut' => $rdv->getDateHeureDebut()->format('Y-m-d H:i:s'),
-                    'fin' => $rdv->getDateHeureFin()->format('Y-m-d H:i:s')
+                    'debut' => $rdv->getDateHeureDebut()->format('d/m/Y à H:i'),
+                    'fin' => $rdv->getDateHeureFin()->format('d/m/Y à H:i')
                 ];
             }
 
@@ -60,8 +56,8 @@ class GetCreneauxOccupesPraticienAction
                     ]
                 ],
                 'periode' => [
-                    'debut' => $debut->format('Y-m-d'),
-                    'fin' => $fin->format('Y-m-d')
+                    'debut' => $debut->format('d/m/Y'),
+                    'fin' => $fin->format('d/m/Y')
                 ],
                 'nombre' => count($creneaux),
                 'creneaux' => $creneaux,

@@ -13,7 +13,7 @@ interface ServicePraticienInterface
 
     public function getAllPraticiens(): array;
 
-    public function getCreneauxOccupes(
+    public function getRendezVousPourPeriode(
         string $praticienId,
         DateTime $debut,
         DateTime $fin

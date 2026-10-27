@@ -77,12 +77,15 @@ class PraticienRepository implements PraticienRepositoryInterface {
     public function findByIdAvecRendezVous(string $id, DateTime $debut, DateTime $fin): Praticien {
         $praticien = $this->findById($id);
 
-        $stmt = $this->pdo->prepare('SELECT * FROM rdv
-                                     WHERE praticien_id = :id
-                                       AND statut <> :annule
-                                       AND date_heure_debut < :fin
-                                       AND date_heure_fin > :debut
-                                     ORDER BY date_heure_debut');
+        $stmt = $this->pdo->prepare('SELECT rdv.*, patient.nom AS patient_nom, patient.prenom AS patient_prenom
+            FROM rdv
+            INNER JOIN patient ON rdv.patient_id = patient.id
+            WHERE rdv.praticien_id = :id
+            AND rdv.statut <> :annule
+            AND rdv.date_heure_debut < :fin
+            AND rdv.date_heure_fin > :debut
+            ORDER BY rdv.date_heure_debut');
+
         $stmt->execute([
             'id' => $id,
             'annule' => 1,
@@ -102,6 +105,8 @@ class PraticienRepository implements PraticienRepositoryInterface {
                 (int) $data['duree'],
                 $data['motif_visite']
             );
+
+            $rdv->setInformationsPatient($data['patient_nom'], $data['patient_prenom']);
 
             $praticien->ajouterRendezVous($rdv);
         }
