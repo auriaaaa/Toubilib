@@ -121,7 +121,7 @@ it('should return an empty array when there are no practitioners', function () {
         ->toBe([]);
 });
 
-// ------------------------------------------------------------ getCreneauxOccupes()
+// ------------------------------------------------------------ getRendezVousPourPeriode()
 
 it('should return occupied appointments for a practitioner during a period', function () {
     $praticien = makePraticien();
@@ -158,7 +158,7 @@ it('should return occupied appointments for a practitioner during a period', fun
 
     $service = new ServicePraticien($repository);
 
-    $result = $service->getCreneauxOccupes(
+    $result = $service->getRendezVousPourPeriode(
         PRATICIEN_UUID,
         new DateTime('next monday 09:00'),
         new DateTime('next monday 12:00')
@@ -178,7 +178,7 @@ it('should return an empty array when there are no occupied appointments', funct
 
     $service = new ServicePraticien($repository);
 
-    $result = $service->getCreneauxOccupes(
+    $result = $service->getRendezVousPourPeriode(
         PRATICIEN_UUID,
         new DateTime('next monday 09:00'),
         new DateTime('next monday 12:00')
@@ -192,7 +192,7 @@ it('should throw an exception when the start date is after the end date', functi
         makePraticien()
     ]);
 
-    expect(fn () => $service->getCreneauxOccupes(
+    expect(fn () => $service->getRendezVousPourPeriode(
         PRATICIEN_UUID,
         new DateTime('next monday 12:00'),
         new DateTime('next monday 09:00')
@@ -209,7 +209,7 @@ it('should throw an exception when the start date equals the end date', function
 
     $date = new DateTime('next monday 10:00');
 
-    expect(fn () => $service->getCreneauxOccupes(
+    expect(fn () => $service->getRendezVousPourPeriode(
         PRATICIEN_UUID,
         $date,
         clone $date
@@ -217,4 +217,138 @@ it('should throw an exception when the start date equals the end date', function
         InvalidArgumentException::class,
         'La date de début doit précéder la date de fin.'
     );
+});
+
+// ------------------------------------------------------------ rechercherPraticiens()
+
+it('should find practitioners by specialty', function () {
+    $nancy = makePraticien();
+
+    $paris = new Praticien(
+        'praticien-2',
+        'Martin',
+        'Paul',
+        'Paris',
+        'paul@example.com',
+        '0600000000',
+        2,
+        'structure-2',
+        'rpps-2',
+        false,
+        true,
+        'Dr.'
+    );
+
+    $service = makeServicePraticien([$nancy, $paris]);
+
+    $result = $service->rechercherPraticiens(2, null);
+
+    expect($result)
+        ->toHaveCount(1)
+        ->and($result[0]->getId())->toBe('praticien-2');
+});
+
+
+it('should find practitioners by city', function () {
+    $nancy = makePraticien();
+
+    $paris = new Praticien(
+        'praticien-2',
+        'Martin',
+        'Paul',
+        'Paris',
+        'paul@example.com',
+        '0600000000',
+        2,
+        'structure-2',
+        'rpps-2',
+        false,
+        true,
+        'Dr.'
+    );
+
+    $service = makeServicePraticien([$nancy, $paris]);
+
+    $result = $service->rechercherPraticiens(null, 'Paris');
+
+    expect($result)
+        ->toHaveCount(1)
+        ->and($result[0]->getVille())->toBe('Paris');
+});
+
+
+it('should find practitioners by specialty and city', function () {
+    $praticiens = [
+        makePraticien(), // Nancy, spécialité 1
+        new Praticien(
+            'praticien-2',
+            'Martin',
+            'Paul',
+            'Paris',
+            'paul@example.com',
+            '0600000000',
+            2,
+            'structure-2',
+            'rpps-2',
+            false,
+            true,
+            'Dr.'
+        ),
+        new Praticien(
+            'praticien-3',
+            'Durand',
+            'Julie',
+            'Paris',
+            'julie@example.com',
+            '0600000001',
+            1,
+            'structure-3',
+            'rpps-3',
+            false,
+            true,
+            'Dr.'
+        ),
+    ];
+
+    $service = makeServicePraticien($praticiens);
+
+    $result = $service->rechercherPraticiens(1, 'Paris');
+
+    expect($result)
+        ->toHaveCount(1)
+        ->and($result[0]->getId())->toBe('praticien-3');
+});
+
+
+it('should return an empty array when no practitioner matches the criteria', function () {
+    $service = makeServicePraticien([makePraticien()]);
+
+    $result = $service->rechercherPraticiens(99, 'Paris');
+
+    expect($result)->toBe([]);
+});
+
+
+it('should return all practitioners when no criteria are provided', function () {
+    $praticien1 = makePraticien();
+
+    $praticien2 = new Praticien(
+        'praticien-2',
+        'Martin',
+        'Paul',
+        'Paris',
+        'paul@example.com',
+        '0600000000',
+        2,
+        'structure-2',
+        'rpps-2',
+        false,
+        true,
+        'Dr.'
+    );
+
+    $service = makeServicePraticien([$praticien1, $praticien2]);
+
+    expect($service->rechercherPraticiens(null, null))
+        ->toHaveCount(2);
 });

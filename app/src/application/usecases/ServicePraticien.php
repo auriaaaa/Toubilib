@@ -54,7 +54,12 @@ class ServicePraticien implements ServicePraticienInterface
         ?string $specialite,
         ?string $ville
     ): array {
-        return $this->praticienRepository->rechercher((int)$specialite, $ville);
+        return $this->praticienRepository->rechercher(
+            $specialite !== null && $specialite !== ''
+                ? (int) $specialite
+                : null,
+            $ville
+        );
     }
 }
 

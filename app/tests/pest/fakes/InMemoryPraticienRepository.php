@@ -38,4 +38,29 @@ class InMemoryPraticienRepository implements PraticienRepositoryInterface
     {
         return isset($this->praticiens[$id]);
     }
+
+    public function rechercher(?int $specialiteId, ?string $ville): array
+    {
+        return array_values(array_filter(
+            $this->praticiens,
+            function (Praticien $praticien) use ($specialiteId, $ville) {
+                if (
+                    $specialiteId !== null
+                    && $praticien->getSpecialiteId() !== $specialiteId
+                ) {
+                    return false;
+                }
+
+                if (
+                    $ville !== null
+                    && trim($ville) !== ''
+                    && stripos($praticien->getVille(), trim($ville)) === false
+                ) {
+                    return false;
+                }
+
+                return true;
+            }
+        ));
+    }
 }
