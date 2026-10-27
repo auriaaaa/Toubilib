@@ -49,6 +49,13 @@ class ServicePraticien implements ServicePraticienInterface
 
         return $praticien->getRendezVousPourPeriode($debut, $fin);
     }
+
+    public function rechercherPraticiens(
+        ?string $specialite,
+        ?string $ville
+    ): array {
+        return $this->praticienRepository->rechercher((int)$specialite, $ville);
+    }
 }
 
 

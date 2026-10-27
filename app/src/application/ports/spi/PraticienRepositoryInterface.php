@@ -14,5 +14,7 @@ interface PraticienRepositoryInterface
 
     public function findAll(): array;
 
+    public function rechercher(?int $specialiteId, ?string $ville): array;
+
     public function existe(string $id): bool;
 } 

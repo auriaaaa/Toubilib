@@ -13,9 +13,7 @@ interface ServicePraticienInterface
 
     public function getAllPraticiens(): array;
 
-    public function getRendezVousPourPeriode(
-        string $praticienId,
-        DateTime $debut,
-        DateTime $fin
-    ): array;
+    public function getRendezVousPourPeriode(string $praticienId, DateTime $debut, DateTime $fin): array;
+
+    public function rechercherPraticiens(?string $specialite, ?string $ville): array;
 }

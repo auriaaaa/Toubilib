@@ -136,6 +136,50 @@ class PraticienRepository implements PraticienRepositoryInterface {
         return $praticiens;
     }
 
+    public function rechercher(?int $specialiteId, ?string $ville): array {
+        $sql = 'SELECT * FROM praticien';
+        $conditions = [];
+        $params = [];
+
+        if ($specialiteId !== null) {
+            $conditions[] = 'specialite_id = :specialite_id';
+            $params['specialite_id'] = $specialiteId;
+        }
+
+        if ($ville !== null && trim($ville) !== '') {
+            $conditions[] = 'LOWER(ville) LIKE LOWER(:ville)';
+            $params['ville'] = '%' . trim($ville) . '%';
+        }
+
+        if (!empty($conditions)) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        $praticiens = [];
+
+        while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $praticiens[] = new Praticien(
+                $data['id'],
+                $data['nom'],
+                $data['prenom'],
+                $data['ville'],
+                $data['email'],
+                $data['telephone'],
+                (int) $data['specialite_id'],
+                $data['structure_id'],
+                $data['rpps_id'] ?? '',
+                (bool) $data['organisation'],
+                (bool) $data['nouveau_patient'],
+                $data['titre']
+            );
+        }
+
+        return $praticiens;
+    }
+
     public function existe(string $id): bool {
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM praticien WHERE id = :id');
         $stmt->execute(['id' => $id]);
