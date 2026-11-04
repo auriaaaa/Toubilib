@@ -8,6 +8,7 @@ use DateTime;
 use toubilib\application\ports\api\ServicePraticienInterface;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\dto\PraticienDTO;
+use toubilib\application\dto\RendezVousAgendaDTO;
 
 class ServicePraticien implements ServicePraticienInterface
 {
@@ -31,8 +32,13 @@ class ServicePraticien implements ServicePraticienInterface
 
     public function getAllPraticiens(): array
     {
-        $praticiens = $this->praticienRepository->findAll();
-        return array_map([PraticienDTO::class, 'fromEntity'], $praticiens);
+        $resultat = [];
+
+        foreach ($this->praticienRepository->findAll() as $praticien) {
+            $resultat[] = PraticienDTO::fromEntity($praticien);
+        }
+
+        return $resultat;
     }
     
     public function getRendezVousPourPeriode(
@@ -47,19 +53,35 @@ class ServicePraticien implements ServicePraticienInterface
         $praticien = $this->praticienRepository
             ->findByIdAvecRendezVous($praticienId, $debut, $fin);
 
-        return $praticien->getRendezVousPourPeriode($debut, $fin);
+        $resultat = [];
+
+        foreach ($praticien->getRendezVousPourPeriode($debut, $fin) as $rdv) {
+            $resultat[] = RendezVousAgendaDTO::fromEntity($rdv);
+        }
+
+        return $resultat;
     }
 
-    public function rechercherPraticiens(
-        ?string $specialite,
-        ?string $ville
-    ): array {
-        return $this->praticienRepository->rechercher(
-            $specialite !== null && $specialite !== ''
-                ? (int) $specialite
-                : null,
-            $ville
-        );
+    public function rechercherPraticiens(?string $specialite, ?string $ville): array
+    {
+        $specialiteId = null;
+
+        if ($specialite !== null && $specialite !== '') {
+            if (!ctype_digit($specialite)) {
+                throw new \InvalidArgumentException("La spécialité doit être un identifiant numérique.");
+            }
+            $specialiteId = (int) $specialite;
+        }
+
+        $praticiens = $this->praticienRepository->rechercher($specialiteId, $ville);
+
+        $resultat = [];
+
+        foreach ($praticiens as $praticien) {
+            $resultat[] = PraticienDTO::fromEntity($praticien);
+        }
+
+        return $resultat;
     }
 }
 

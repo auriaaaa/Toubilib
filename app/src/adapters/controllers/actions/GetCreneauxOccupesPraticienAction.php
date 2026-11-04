@@ -5,10 +5,12 @@ namespace toubilib\adapters\controllers\actions;
 use DateTime;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use toubilib\application\usecases\ServicePraticienInterface;
+use toubilib\application\ports\api\ServicePraticienInterface;
 
 class GetCreneauxOccupesPraticienAction
 {
+    private ServicePraticienInterface $servicePraticien;
+
     public function __construct(ServicePraticienInterface $servicePraticien) {
         $this->servicePraticien = $servicePraticien;
     }
@@ -38,8 +40,8 @@ class GetCreneauxOccupesPraticienAction
 
             foreach ($rendezVous as $rdv) {
                 $creneaux[] = [
-                    'debut' => $rdv->getDateHeureDebut()->format('d/m/Y à H:i'),
-                    'fin' => $rdv->getDateHeureFin()->format('d/m/Y à H:i')
+                    'debut' => $rdv->date_heure_debut,
+                    'fin' => $rdv->date_heure_fin
                 ];
             }
 
