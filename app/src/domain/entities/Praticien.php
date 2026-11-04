@@ -31,6 +31,7 @@ class Praticien
     private string $titre;
 
     private array $rendezVous = [];
+    private ?Specialite $specialite = null;
 
     public function __construct(
         string $id,
@@ -74,6 +75,9 @@ class Praticien
     public function getTitre(): string { return $this->titre; }
 
     public function getRendezVous(): array { return $this->rendezVous; }
+
+    public function getSpecialite(): ?Specialite { return $this->specialite; }
+    public function setSpecialite(?Specialite $specialite): void { $this->specialite = $specialite; }
 
     public function ajouterRendezVous(RendezVous $rendezVous): void
     {

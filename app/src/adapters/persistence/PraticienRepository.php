@@ -3,9 +3,10 @@ namespace toubilib\adapters\persistence;
 
 use DateTime;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
+use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\entities\RendezVous;
-use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
+use toubilib\domain\entities\Specialite;
 
 class PraticienRepository implements PraticienRepositoryInterface {
 
@@ -50,15 +51,23 @@ class PraticienRepository implements PraticienRepositoryInterface {
         }
     }
 
-    public function findById(string $id) : Praticien {
-        $stmt = $this->pdo->prepare('SELECT * FROM praticien WHERE id = :id');
+    public function findById(string $id): Praticien {
+        $stmt = $this->pdo->prepare(
+            'SELECT p.*,
+                    s.libelle     AS specialite_libelle,
+                    s.description AS specialite_description
+            FROM praticien p
+            LEFT JOIN specialite s ON p.specialite_id = s.id
+            WHERE p.id = :id'
+        );
         $stmt->execute(['id' => $id]);
-        if ($stmt->rowCount() === 0) {
-            throw new \Exception("Praticien not found");
-        }
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        return new Praticien(
+        if ($data === false) {
+            throw new \Exception("Praticien not found");
+        }
+
+        $praticien = new Praticien(
             $data['id'],
             $data['nom'],
             $data['prenom'],
@@ -72,6 +81,16 @@ class PraticienRepository implements PraticienRepositoryInterface {
             (bool)$data['nouveau_patient'],
             $data['titre']
         );
+
+        if ($data['specialite_libelle'] !== null) {
+            $praticien->setSpecialite(new Specialite(
+                (int)$data['specialite_id'],
+                $data['specialite_libelle'],
+                $data['specialite_description'] ?? ''
+            ));
+        }
+
+        return $praticien;
     }
 
     public function findByIdAvecRendezVous(string $id, DateTime $debut, DateTime $fin): Praticien {

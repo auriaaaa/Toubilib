@@ -9,6 +9,7 @@ use toubilib\application\ports\api\ServicePraticienInterface;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\dto\PraticienDTO;
 use toubilib\application\dto\RendezVousAgendaDTO;
+use toubilib\application\dto\PraticienDetailDTO;
 
 class ServicePraticien implements ServicePraticienInterface
 {
@@ -19,7 +20,7 @@ class ServicePraticien implements ServicePraticienInterface
         $this->praticienRepository = $praticienRepository;
     }
 
-    public function getPraticien(string $id): PraticienDTO
+    public function getPraticien(string $id): PraticienDetailDTO
     {
         try {
             $praticien = $this->praticienRepository->findById($id);
@@ -27,7 +28,7 @@ class ServicePraticien implements ServicePraticienInterface
             throw new \Exception("Aucun praticien trouvé avec l'ID : $id");
         }
 
-        return PraticienDTO::fromEntity($praticien);
+        return PraticienDetailDTO::fromEntity($praticien);
     }
 
     public function getAllPraticiens(): array
