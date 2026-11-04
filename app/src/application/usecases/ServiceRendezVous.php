@@ -59,6 +59,9 @@ class ServiceRendezVous implements ServiceRendezVousInterface
             throw new ValidationException(['date_heure_debut' => $e->getMessage()]);
         }
 
+        $rendezVous->setInformationsPatient($patient->getNom(), $patient->getPrenom());
+        $rendezVous->setInformationsPraticien($praticien->getNom(), $praticien->getPrenom());
+
         $this->rendezVousRepository->save($rendezVous);
 
         return RendezVousDTO::fromEntity($rendezVous);

@@ -3,9 +3,6 @@ namespace toubilib\adapters\controllers\actions;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Exception\HttpBadRequestException;
-use Slim\Exception\HttpNotFoundException;
-
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 
 class GetRendezVousAction {
@@ -21,38 +18,28 @@ class GetRendezVousAction {
         ResponseInterface $rs,
         array $args
     ): ResponseInterface {
-
         $id = $args['id'];
 
-        $rendezVous_dto = $this->serviceRendezVous->getRendezVous($id);
-        $est_modifiable = $this->serviceRendezVous->statutModifiable($id);
+        $rdv = $this->serviceRendezVous->getRendezVous($id);
+        $modifiable = $this->serviceRendezVous->statutModifiable($id);
 
-        $data = [
-            'rendezVous' => $rendezVous_dto,
-            '_links' => [
-                'self' => [
-                    'href' => '/rendezvous/' . $id,
-                    'method' => 'GET'
-                ]
-            ]
+        $links = [
+            'self'      => ['href' => '/rdvs/' . $rdv->id],
+            'praticien' => ['href' => '/praticiens/' . $rdv->praticien_id],
+            'patient'   => ['href' => '/patients/' . $rdv->patient_id],
         ];
 
-        if ($est_modifiable) {
-            $data['_links']['annuler'] = [
-                'href' => '/rendezvous/' . $id . '/annuler',
-                'method' => 'POST'
-            ];
-
-            $data['_links']['honorer'] = [
-                'href' => '/rendezvous/' . $id . '/honorer',
-                'method' => 'POST'
-            ];
-
-            $data['_links']['ignorer'] = [
-                'href' => '/rendezvous/' . $id . '/ignorer',
-                'method' => 'POST'
-            ];
+        if ($modifiable) {
+            $links['annuler'] = ['href' => '/rdvs/' . $rdv->id . '/annuler'];
+            $links['honorer'] = ['href' => '/rdvs/' . $rdv->id . '/honorer'];
+            $links['ignorer'] = ['href' => '/rdvs/' . $rdv->id . '/ignorer'];
         }
+
+        $data = [
+            'type'       => 'ressource',
+            'rendez_vous' => $rdv,
+            'links'      => $links,
+        ];
 
         $rs->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
@@ -60,5 +47,4 @@ class GetRendezVousAction {
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(200);
     }
-
 }

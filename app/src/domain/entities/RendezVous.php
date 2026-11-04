@@ -23,6 +23,9 @@ class RendezVous
     private ?string $patientNom = null;
     private ?string $patientPrenom = null;
 
+    private ?string $praticienNom = null;
+    private ?string $praticienPrenom = null;
+
     public function __construct(
         string $id,
         string $praticien_id,
@@ -63,6 +66,37 @@ class RendezVous
     {
         $this->patientNom = $nom;
         $this->patientPrenom = $prenom;
+    }
+
+    public function getPraticienNom(): ?string { return $this->praticienNom; }
+    public function getPraticienPrenom(): ?string { return $this->praticienPrenom; }
+
+    public function setInformationsPraticien(?string $nom, ?string $prenom): void
+    {
+        $this->praticienNom = $nom;
+        $this->praticienPrenom = $prenom;
+    }
+
+    // Valeur lisible de l'état pour l'API
+    public function getEtat(): string
+    {
+        return match ($this->statut) {
+            0 => 'PREVU',
+            1 => 'ANNULE',
+            2 => 'HONORE',
+            3 => 'IGNORE',
+            default => 'INCONNU',
+        };
+    }
+
+    public function getMotifLibelle(): string
+    {
+        return match ($this->motif_visite) {
+            'CI' => 'Consultation initiale',
+            'CO', 'C0' => 'Consultation',
+            'CS' => 'Consultation de suivi',
+            default => $this->motif_visite,
+        };
     }
     
     public static function creer(

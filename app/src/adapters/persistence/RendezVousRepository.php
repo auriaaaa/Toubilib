@@ -44,7 +44,17 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
     }
 
     public function findById(string $id): RendezVous {
-        $stmt = $this->pdo->prepare('SELECT * FROM rdv WHERE id = :id');
+        $stmt = $this->pdo->prepare(
+            'SELECT r.*,
+                    pa.nom    AS patient_nom,
+                    pa.prenom AS patient_prenom,
+                    pr.nom    AS praticien_nom,
+                    pr.prenom AS praticien_prenom
+            FROM rdv r
+            LEFT JOIN patient pa   ON r.patient_id = pa.id
+            LEFT JOIN praticien pr ON r.praticien_id = pr.id
+            WHERE r.id = :id'
+        );
         $stmt->execute(['id' => $id]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -52,7 +62,7 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
             throw new RendezVousNotFoundException("Aucun rendez-vous trouvé avec l'ID : $id");
         }
 
-        return new RendezVous(
+        $rdv = new RendezVous(
             $data['id'],
             $data['praticien_id'],
             $data['patient_id'],
@@ -63,6 +73,11 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
             (int)$data['duree'],
             $data['motif_visite']
         );
+
+        $rdv->setInformationsPatient($data['patient_nom'], $data['patient_prenom']);
+        $rdv->setInformationsPraticien($data['praticien_nom'], $data['praticien_prenom']);
+
+        return $rdv;
     }
 
 }
