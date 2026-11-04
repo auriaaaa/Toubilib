@@ -41,18 +41,10 @@ class GetAllPraticienAction {
         $praticiens = [];
 
         foreach ($praticiens_dto as $praticien) {
-            $id = $praticien->getId();
+            $id = $praticien->id;
 
             $praticiens[] = [
-                'praticien' => [
-                    'id' => $praticien->getId(),
-                    'nom' => $praticien->getNom(),
-                    'prenom' => $praticien->getPrenom(),
-                    'ville' => $praticien->getVille(),
-                    'email' => $praticien->getEmail(),
-                    'telephone' => $praticien->getTelephone(),
-                    'specialite_id' => $praticien->getSpecialiteId(),
-                ],
+                'praticien' => $praticien,
                 '_links' => [
                     'self' => [
                         'href' => '/praticiens/' . $id,
