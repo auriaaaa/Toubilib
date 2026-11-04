@@ -18,45 +18,13 @@ class AnnulerRendezVousAction {
         $this->serviceRendezVous = $serviceRendezVous;
     }
 
-    public function __invoke(
-        ServerRequestInterface $rq,
-        ResponseInterface $rs,
-        array $args
-    ): ResponseInterface {
-        $id = $args['id'] ?? null;
-
-        if ($id === null || $id === '') {
-            throw new HttpBadRequestException($rq, "L'ID du rendez-vous est requis.");
-        }
-
-        if (!is_string($id)) {
-            throw new HttpBadRequestException($rq, "L'ID du rendez-vous doit être une chaîne de caractères.");
-        }
-
-        try {
-            $dto = $this->serviceRendezVous->annuler($id);
-        } catch (StatutRendezVousInvalideException $e) {
-            throw new HttpBadRequestException(
-                $rq,
-                $e->getMessage()
-            );
-        } catch (RendezVousDejaPasseException $e) {
-            throw new HttpBadRequestException(
-                $rq,
-                $e->getMessage()
-            );
-        } catch (\Exception $e) {
-            throw new HttpNotFoundException(
-                $rq,
-                "Rendez-vous non trouvé."
-            );
-        }
+    public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface
+    {
+        $dto = $this->serviceRendezVous->annuler($args['id']);
 
         $rs->getBody()->write(json_encode($dto));
 
-        return $rs
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+        return $rs->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
 }

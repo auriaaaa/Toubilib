@@ -3,8 +3,8 @@
 namespace toubilib\adapters\controllers\actions;
 
 use DateTime;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use toubilib\application\ports\api\ServicePraticienInterface;
 
 class GetCreneauxOccupesPraticienAction
@@ -16,73 +16,68 @@ class GetCreneauxOccupesPraticienAction
     }
 
     public function __invoke(
-        Request $request,
-        Response $response,
+        ServerRequestInterface $rq,
+        ResponseInterface $rs,
         array $args
-    ): Response {
-        $params = $request->getQueryParams();
+    ): ResponseInterface {
+        $params = $rq->getQueryParams();
+        $id = $args['id'];
 
         if (!isset($params['debut'], $params['fin'])) {
-            $response->getBody()->write(json_encode([
-                'erreur' => 'Les paramètres debut et fin sont obligatoires. Format attendu : .../creneaux-occupes?debut=2025-10-13&fin=2026-10-20'
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+            throw new \InvalidArgumentException(
+                'Les paramètres debut et fin sont obligatoires (ex. ?debut=2025-12-01&fin=2025-12-05).'
+            );
         }
 
         try {
             $debut = new DateTime($params['debut']);
             $fin = new DateTime($params['fin']);
-
-            $rendezVous = $this->servicePraticien->getRendezVousPourPeriode($args['id'], $debut, $fin);
-
-            $creneaux = [];
-
-            foreach ($rendezVous as $rdv) {
-                $creneaux[] = [
-                    'debut' => $rdv->date_heure_debut,
-                    'fin' => $rdv->date_heure_fin
-                ];
-            }
-
-            $data = [
-                'praticien' => [
-                    'id' => $args['id'],
-                    '_links' => [
-                        'self' => [
-                            'href' => '/praticiens/' . $args['id']
-                        ],
-                        'agenda' => [
-                            'href' => '/praticiens/' . $args['id'] . '/agenda'
-                        ]
-                    ]
-                ],
-                'periode' => [
-                    'debut' => $debut->format('d/m/Y'),
-                    'fin' => $fin->format('d/m/Y')
-                ],
-                'nombre' => count($creneaux),
-                'creneaux' => $creneaux,
-                '_links' => [
-                    'self' => [
-                        'href' => $request->getUri()->getPath()
-                            . '?debut=' . $debut->format('Y-m-d')
-                            . '&fin=' . $fin->format('Y-m-d')
-                    ]
-                ]
-            ];
-
-            $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-            return $response->withHeader('Content-Type', 'application/json; charset=utf-8');
-
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode([
-                'erreur' => $e->getMessage()
-            ]));
-
-            return $response->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+            throw new \InvalidArgumentException('Format de date invalide.');
         }
+
+        $rendezVous = $this->servicePraticien->getRendezVousPourPeriode($id, $debut, $fin);
+
+        // Seuls les horaires sont exposés
+        $creneaux = [];
+
+        foreach ($rendezVous as $rdv) {
+            $creneaux[] = [
+                'debut' => $rdv->date_heure_debut,
+                'fin'   => $rdv->date_heure_fin,
+            ];
+        }
+
+        $data = [
+            'praticien' => ['id' => $id],
+            'periode' => [
+                'debut' => $debut->format('Y-m-d'),
+                'fin'   => $fin->format('Y-m-d'),
+            ],
+            'nombre' => count($creneaux),
+            'creneaux' => $creneaux,
+            '_links' => [
+                'self' => [
+                    'href' => $rq->getUri()->getPath()
+                        . '?debut=' . urlencode($params['debut'])
+                        . '&fin=' . urlencode($params['fin']),
+                    'method' => 'GET',
+                ],
+                'praticien' => [
+                    'href' => '/praticiens/' . $id,
+                    'method' => 'GET',
+                ],
+                'agenda' => [
+                    'href' => '/praticiens/' . $id . '/agenda',
+                    'method' => 'GET',
+                ],
+            ],
+        ];
+
+        $rs->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        return $rs
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
     }
 }

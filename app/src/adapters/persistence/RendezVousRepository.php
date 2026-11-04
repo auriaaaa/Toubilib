@@ -4,6 +4,7 @@ namespace toubilib\adapters\persistence;
 use toubilib\application\ports\spi\RendezVousRepositoryInterface;
 use toubilib\domain\entities\RendezVous;
 use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
+use toubilib\domain\exceptions\RendezVousNotFoundException;
 
 class RendezVousRepository implements RendezVousRepositoryInterface {
 
@@ -42,13 +43,14 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
         }
     }
 
-    public function findById(string $id) : RendezVous {
+    public function findById(string $id): RendezVous {
         $stmt = $this->pdo->prepare('SELECT * FROM rdv WHERE id = :id');
         $stmt->execute(['id' => $id]);
-        if ($stmt->rowCount() === 0) {
-            throw new \Exception("Rendez-vous not found");
-        }
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($data === false) {
+            throw new RendezVousNotFoundException("Aucun rendez-vous trouvé avec l'ID : $id");
+        }
 
         return new RendezVous(
             $data['id'],

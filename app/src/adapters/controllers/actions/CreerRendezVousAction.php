@@ -5,7 +5,6 @@ namespace toubilib\adapters\controllers\actions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use toubilib\application\dto\CreateRendezVousDTO;
-use toubilib\application\exceptions\ValidationException;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 
 class CreerRendezVousAction
@@ -17,46 +16,22 @@ class CreerRendezVousAction
         $this->serviceRendezVous = $serviceRendezVous;
     }
 
-    public function __invoke(
-        ServerRequestInterface $rq,
-        ResponseInterface $rs,
-        array $args
-    ): ResponseInterface {
+    public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface
+    {
+        $donnees = $rq->getParsedBody();
 
-        $donnees = json_decode((string) $rq->getBody(), true);
-
-        if (!is_array($donnees) || json_last_error() !== JSON_ERROR_NONE) {
-            $rs->getBody()->write(json_encode(['erreur' => 'JSON invalide.']));
-
-            return $rs
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
+        if (!is_array($donnees)) {
+            throw new \InvalidArgumentException('Le corps de la requête doit être un objet JSON valide.');
         }
 
-        try {
-            $dto = CreateRendezVousDTO::fromArray($donnees);
-            $rdv = $this->serviceRendezVous->creer($dto);
+        $dto = CreateRendezVousDTO::fromArray($donnees);
+        $rdv = $this->serviceRendezVous->creer($dto);
 
-            $rs->getBody()->write(json_encode($rdv));
+        $rs->getBody()->write(json_encode($rdv));
 
-            return $rs
-                ->withHeader('Content-Type', 'application/json')
-                ->withHeader('Location', '/rdv/' . $rdv->id)
-                ->withStatus(201);
-
-        } catch (ValidationException $e) {
-            $rs->getBody()->write(json_encode(['erreur' => 'Données invalides.']));
-
-            return $rs
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(400);
-
-        } catch (\Throwable $e) {
-            $rs->getBody()->write(json_encode(['erreur' => 'Erreur interne du serveur.']));
-
-            return $rs
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(500);
-        }
+        return $rs
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Location', '/rendezvous/' . $rdv->id)
+            ->withStatus(201);
     }
 }

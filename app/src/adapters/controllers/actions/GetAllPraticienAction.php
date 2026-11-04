@@ -27,16 +27,7 @@ class GetAllPraticienAction {
         $specialite = $params['specialite'] ?? null;
         $ville = $params['ville'] ?? null;
 
-        try {
-            $praticiens_dto = $this->servicePraticien
-                ->rechercherPraticiens($specialite, $ville);
-
-        } catch (\InvalidArgumentException $e) {
-            throw new HttpBadRequestException($rq, $e->getMessage());
-
-        } catch (\Exception $e) {
-            throw new HttpNotFoundException($rq, "Impossible de récupérer les praticiens.");
-        }
+        $praticiens_dto = $this->servicePraticien->rechercherPraticiens($specialite, $ville);
 
         $praticiens = [];
 

@@ -22,12 +22,7 @@ class ServicePraticien implements ServicePraticienInterface
 
     public function getPraticien(string $id): PraticienDetailDTO
     {
-        try {
-            $praticien = $this->praticienRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun praticien trouvé avec l'ID : $id");
-        }
-
+        $praticien = $this->praticienRepository->findById($id);
         return PraticienDetailDTO::fromEntity($praticien);
     }
 

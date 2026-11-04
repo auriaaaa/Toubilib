@@ -36,11 +36,7 @@ class ServiceRendezVous implements ServiceRendezVousInterface
     
     public function getRendezVous(string $id): RendezVousDTO
     {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
-        }
+        $rendezVous = $this->rendezVousRepository->findById($id);
 
         return RendezVousDTO::fromEntity($rendezVous);
     }
@@ -70,39 +66,22 @@ class ServiceRendezVous implements ServiceRendezVousInterface
 
     public function annuler(string $id): RendezVousDTO
     {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun Rendez-vous trouvé avec l'ID : $id");
-        }
-
+        $rendezVous = $this->rendezVousRepository->findById($id);
         $rendezVous->annuler();
-
         $this->rendezVousRepository->save($rendezVous);
 
         return RendezVousDTO::fromEntity($rendezVous);
     }
 
 
-    public function statutModifiable(string $id): bool
+   public function statutModifiable(string $id): bool
     {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
-        }
-
-        return $rendezVous->statutModifiable();
+        return $this->rendezVousRepository->findById($id)->statutModifiable();
     }
 
     public function honorer(string $id): RendezVousDTO
     {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
-        }
-
+        $rendezVous = $this->rendezVousRepository->findById($id);
         $rendezVous->honorer();
 
         $this->rendezVousRepository->save($rendezVous);
@@ -112,12 +91,7 @@ class ServiceRendezVous implements ServiceRendezVousInterface
 
     public function ignorer(string $id): RendezVousDTO
     {
-        try {
-            $rendezVous = $this->rendezVousRepository->findById($id);
-        } catch (\Exception $e) {
-            throw new \Exception("Aucun rendez-vous trouvé avec l'ID : $id");
-        }
-
+        $rendezVous = $this->rendezVousRepository->findById($id);
         $rendezVous->ignorer();
 
         $this->rendezVousRepository->save($rendezVous);

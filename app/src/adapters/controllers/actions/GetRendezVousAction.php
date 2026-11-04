@@ -22,22 +22,10 @@ class GetRendezVousAction {
         array $args
     ): ResponseInterface {
 
-        $id = $args['id'] ?? null;
+        $id = $args['id'];
 
-        if ($id === null || $id === '') {
-            throw new HttpBadRequestException($rq, "L'ID du rendez-vous est requis.");
-        }
-
-        if (!is_string($id)) {
-            throw new HttpBadRequestException($rq, "L'ID du rendez-vous doit être une chaîne de caractères.");
-        }
-
-        try {
-            $rendezVous_dto = $this->serviceRendezVous->getRendezVous($id);
-            $est_modifiable = $this->serviceRendezVous->statutModifiable($id);
-        } catch (\Exception $e) {
-            throw new HttpNotFoundException($rq, "Rendez-vous non trouvé.");
-        }
+        $rendezVous_dto = $this->serviceRendezVous->getRendezVous($id);
+        $est_modifiable = $this->serviceRendezVous->statutModifiable($id);
 
         $data = [
             'rendezVous' => $rendezVous_dto,

@@ -4,6 +4,7 @@ namespace toubilib\adapters\persistence;
 use DateTime;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
+use toubilib\domain\exceptions\PraticienNotFoundException;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\entities\RendezVous;
 use toubilib\domain\entities\Specialite;
@@ -64,7 +65,7 @@ class PraticienRepository implements PraticienRepositoryInterface {
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($data === false) {
-            throw new \Exception("Praticien not found");
+            throw new PraticienNotFoundException("Aucun praticien trouvé avec l'ID : $id");
         }
 
         $praticien = new Praticien(

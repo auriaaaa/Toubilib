@@ -4,6 +4,7 @@ namespace toubilib\adapters\persistence;
 use toubilib\application\ports\spi\PatientRepositoryInterface;
 use toubilib\domain\entities\Patient;
 use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
+use toubilib\domain\exceptions\PatientNotFoundException;
 
 class PatientRepository implements PatientRepositoryInterface {
 
@@ -47,7 +48,7 @@ class PatientRepository implements PatientRepositoryInterface {
         $stmt->execute(['id' => $id]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         if ($data === false) {
-            throw new \Exception("Patient not found");
+            throw new PatientNotFoundException("Aucun patient trouvé avec l'ID : $id");
         }
 
         return new Patient(

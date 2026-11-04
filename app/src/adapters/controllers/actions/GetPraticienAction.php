@@ -22,21 +22,9 @@ class GetPraticienAction {
         array $args
     ): ResponseInterface {
 
-        $id = $args['id'] ?? null;
+        $id = $args['id'];
 
-        if ($id === null || $id === '') {
-            throw new HttpBadRequestException($rq, "L'ID du praticien est requis.");
-        }
-
-        if (!is_string($id)) {
-            throw new HttpBadRequestException($rq, "L'ID du praticien doit être une chaîne de caractères.");
-        }
-
-        try {
-            $praticien_dto = $this->servicePraticien->getPraticien($id);
-        } catch (\Exception $e) {
-            throw new HttpNotFoundException($rq, "Praticien non trouvé.");
-        }
+        $praticien_dto = $this->servicePraticien->getPraticien($id);
 
         $data = [
             'praticien' => $praticien_dto,
