@@ -34,7 +34,7 @@ class IgnorerRendezVousAction {
         }
 
         try {
-            $dto = $this->serviceRendezVous->honorer($id);
+            $dto = $this->serviceRendezVous->ignorer($id);
         } catch (StatutRendezVousInvalideException $e) {
             throw new HttpBadRequestException(
                 $rq,
