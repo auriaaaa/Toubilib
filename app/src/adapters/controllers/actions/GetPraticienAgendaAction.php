@@ -27,10 +27,10 @@ class GetPraticienAgendaAction
         $params = $rq->getQueryParams();
 
         if (!isset($params['debut'], $params['fin'])) {
-            $response->getBody()->write(json_encode([
+            $rs->getBody()->write(json_encode([
                 'erreur' => 'Les paramètres debut et fin sont obligatoires. Format attendu : .../creneaux-occupes?debut=2025-10-13&fin=2026-10-20'
             ]));
-            return $response->withHeader('Content-Type', 'application/json')
+            return $rs->withHeader('Content-Type', 'application/json')
                 ->withStatus(400);
         }
 
