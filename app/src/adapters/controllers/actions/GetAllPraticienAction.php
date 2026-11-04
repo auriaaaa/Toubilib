@@ -27,6 +27,14 @@ class GetAllPraticienAction {
         $specialite = $params['specialite'] ?? null;
         $ville = $params['ville'] ?? null;
 
+        if ($specialite !== null && !is_string($specialite)) {
+            throw new \InvalidArgumentException('Le paramètre specialite doit être une chaîne de caractères.');
+        }
+
+        if ($ville !== null && !is_string($ville)) {
+            throw new \InvalidArgumentException('Le paramètre ville doit être une chaîne de caractères.');
+        }
+
         $praticiens_dto = $this->servicePraticien->rechercherPraticiens($specialite, $ville);
 
         $praticiens = [];

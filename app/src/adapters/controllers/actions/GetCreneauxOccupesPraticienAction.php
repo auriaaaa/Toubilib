@@ -23,7 +23,9 @@ class GetCreneauxOccupesPraticienAction
         $params = $rq->getQueryParams();
         $id = $args['id'];
 
-        if (!isset($params['debut'], $params['fin'])) {
+        if (!isset($params['debut'], $params['fin'])
+            || !is_string($params['debut'])
+            || !is_string($params['fin'])) {
             throw new \InvalidArgumentException(
                 'Les paramètres debut et fin sont obligatoires (ex. ?debut=2025-12-01&fin=2025-12-05).'
             );
@@ -32,6 +34,7 @@ class GetCreneauxOccupesPraticienAction
         try {
             $debut = new DateTime($params['debut']);
             $fin = new DateTime($params['fin']);
+            $fin->setTime(23, 59, 59);   // on couvre toute la journée
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Format de date invalide.');
         }

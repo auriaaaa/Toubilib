@@ -24,7 +24,9 @@ class GetPraticienAgendaAction
         $params = $rq->getQueryParams();
         $id = $args['id'];
 
-        if (!isset($params['debut'], $params['fin'])) {
+        if (!isset($params['debut'], $params['fin'])
+            || !is_string($params['debut'])
+            || !is_string($params['fin'])) {
             throw new \InvalidArgumentException(
                 'Les paramètres debut et fin sont obligatoires (ex. ?debut=2025-12-01&fin=2025-12-05).'
             );
@@ -33,6 +35,7 @@ class GetPraticienAgendaAction
         try {
             $debut = new DateTime($params['debut']);
             $fin = new DateTime($params['fin']);
+            $fin->setTime(23, 59, 59);
         } catch (\Exception $e) {
             throw new \InvalidArgumentException('Format de date invalide.');
         }
