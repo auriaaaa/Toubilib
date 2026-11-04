@@ -1,5 +1,48 @@
 <?php
+use Psr\Container\ContainerInterface;
+use toubilib\adapters\persistence\{PatientRepository, PraticienRepository, RendezVousRepository};
+use toubilib\application\ports\api\{ServicePraticienInterface, ServiceRendezVousInterface};
+use toubilib\application\ports\spi\{PatientRepositoryInterface, PraticienRepositoryInterface, RendezVousRepositoryInterface};
+use toubilib\application\usecases\{ServicePraticien, ServiceRendezVous};
+use toubilib\application\validators\CreateRendezVousValidator;
 
-use toubilib\adapters\config\ContainerConfig;
+return [
 
-return ContainerConfig::build();
+    // Connexion PDO
+    'toubilib.pdo' => function (ContainerInterface $c): \PDO {
+        $dsn = sprintf('%s:host=%s;port=%s;dbname=%s',
+            $c->get('db.driver'), $c->get('db.host'), $c->get('db.port'), $c->get('db.name'));
+
+        return new \PDO($dsn, $c->get('db.user'), $c->get('db.password'), [
+            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ]);
+    },
+
+    // Repositories
+    PraticienRepositoryInterface::class  => \DI\create(PraticienRepository::class)
+        ->constructor(\DI\get('toubilib.pdo')),
+    PatientRepositoryInterface::class    => \DI\create(PatientRepository::class)
+        ->constructor(\DI\get('toubilib.pdo')),
+    RendezVousRepositoryInterface::class => \DI\create(RendezVousRepository::class)
+        ->constructor(\DI\get('toubilib.pdo')),
+
+    // Validateur 
+    CreateRendezVousValidator::class => \DI\create(CreateRendezVousValidator::class)
+        ->constructor(
+            \DI\get(PraticienRepositoryInterface::class),
+            \DI\get(PatientRepositoryInterface::class)
+        ),
+
+    // Services
+    ServicePraticienInterface::class => \DI\create(ServicePraticien::class)
+        ->constructor(\DI\get(PraticienRepositoryInterface::class)),
+
+    ServiceRendezVousInterface::class => \DI\create(ServiceRendezVous::class)
+        ->constructor(
+            \DI\get(RendezVousRepositoryInterface::class),
+            \DI\get(PraticienRepositoryInterface::class),
+            \DI\get(PatientRepositoryInterface::class),
+            \DI\get(CreateRendezVousValidator::class)
+        ),
+];

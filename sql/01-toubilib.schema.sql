@@ -37,7 +37,7 @@ CREATE TABLE "public"."rdv" (
     "praticien_id" character varying(64) NOT NULL,
     "patient_id" character varying(64) NOT NULL,
     "date_heure_debut" timestamp NOT NULL,
-    "status" smallint DEFAULT '0' NOT NULL,
+    "statut" smallint DEFAULT '0' NOT NULL,
     "duree" smallint DEFAULT '30' NOT NULL,
     "date_heure_fin" timestamp,
     "date_creation" timestamp,
@@ -55,6 +55,11 @@ CREATE TABLE "public"."specialite" (
     "description" text,
     CONSTRAINT "specialite_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
+
+
+ALTER TABLE rdv
+ADD CONSTRAINT rdv_pkey PRIMARY KEY (id);
+
 
 
 -- 2026-09-07 07:29:46.179361+00

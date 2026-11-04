@@ -1,71 +1,49 @@
 <?php
 
-use Slim\Factory\AppFactory;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use toubilib\adapters\controllers\middlewares\Cors;
-
-use toubilib\adapters\controllers\actions\CreerRendezVousAction;
-use toubilib\adapters\controllers\actions\GetRendezVousAction;
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
-use toubilib\adapters\controllers\actions\HonorerRendezVousAction;
-use toubilib\adapters\controllers\actions\IgnorerRendezVousAction;
-use toubilib\adapters\controllers\actions\GetPraticienAction;
+use toubilib\adapters\controllers\actions\CreerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetAllPraticienAction;
 use toubilib\adapters\controllers\actions\GetCreneauxOccupesPraticienAction;
+use toubilib\adapters\controllers\actions\GetPraticienAction;
 use toubilib\adapters\controllers\actions\GetPraticienAgendaAction;
+use toubilib\adapters\controllers\actions\GetRendezVousAction;
+use toubilib\adapters\controllers\actions\HonorerRendezVousAction;
+use toubilib\adapters\controllers\actions\IgnorerRendezVousAction;
+use toubilib\adapters\controllers\middlewares\Cors;
+use toubilib\application\ports\api\ServicePraticienInterface;
+use toubilib\application\ports\api\ServiceRendezVousInterface;
 
-$settings = require __DIR__ . '/settings.php';
-$container = require __DIR__ . '/services.php';
+return [
 
-// Initialisation de Slim
-$app = AppFactory::createFromContainer($container);
+    // Middleware
+    Cors::class => \DI\create(Cors::class),
 
-// Middlewares
-$app->addBodyParsingMiddleware();
-$app->addRoutingMiddleware();
+    // Actions qui utilisent le service  rendez-vous
+    CreerRendezVousAction::class => \DI\create(CreerRendezVousAction::class)
+        ->constructor(\DI\get(ServiceRendezVousInterface::class)),
 
-// Gestion des erreurs
-$errorMiddleware = $app->addErrorMiddleware(true, false, false);
-$errorHandler = $errorMiddleware->getDefaultErrorHandler();
-$errorHandler->forceContentType('application/json');
+    GetRendezVousAction::class => \DI\create(GetRendezVousAction::class)
+        ->constructor(\DI\get(ServiceRendezVousInterface::class)),
 
-$errorHandler->registerErrorRenderer(
-    'application/json',
-    function ($exception, $displayErrorDetails) {
-        return json_encode([
-            'message' => $exception->getMessage()
-        ]);
-    }
-);
+    AnnulerRendezVousAction::class => \DI\create(AnnulerRendezVousAction::class)
+        ->constructor(\DI\get(ServiceRendezVousInterface::class)),
 
-// CORS
-$app->add(Cors::class);
+    HonorerRendezVousAction::class => \DI\create(HonorerRendezVousAction::class)
+        ->constructor(\DI\get(ServiceRendezVousInterface::class)),
 
-// Routes des rendez-vous.
-$app->group('/rendezvous', function (\Slim\Routing\RouteCollectorProxy $group) {
-    $group->post('[/]', CreerRendezVousAction::class);
-    $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class);
-    $group->post('/{id}/honorer[/]', HonorerRendezVousAction::class);
-    $group->post('/{id}/ignorer[/]', IgnorerRendezVousAction::class);
-    $group->get('/{id}[/]', GetRendezVousAction::class);
-});
+    IgnorerRendezVousAction::class => \DI\create(IgnorerRendezVousAction::class)
+        ->constructor(\DI\get(ServiceRendezVousInterface::class)),
 
-// Routes des praticiens.
-$app->group('/praticiens', function (\Slim\Routing\RouteCollectorProxy $group) {
-    $group->get('[/]', GetAllPraticienAction::class);
-    $group->get('/{id}[/]', GetPraticienAction::class);
-    $group->get('/{id}/agenda[/]', GetPraticienAgendaAction::class);
-    $group->get('/{id}/creneaux-occupes', GetCreneauxOccupesPraticienAction::class);
-});
+    // Actions qui utilisent le service des praticiens
+    GetAllPraticienAction::class => \DI\create(GetAllPraticienAction::class)
+        ->constructor(\DI\get(ServicePraticienInterface::class)),
 
-$app->options(
-    '/{routes:.+}',
-    function (Request $request, Response $response): Response {
-        return $response;
-    }
-);
+    GetPraticienAction::class => \DI\create(GetPraticienAction::class)
+        ->constructor(\DI\get(ServicePraticienInterface::class)),
 
-$routeParser = $app->getRouteCollector()->getRouteParser();
+    GetPraticienAgendaAction::class => \DI\create(GetPraticienAgendaAction::class)
+        ->constructor(\DI\get(ServicePraticienInterface::class)),
 
-return $app;
+    GetCreneauxOccupesPraticienAction::class => \DI\create(GetCreneauxOccupesPraticienAction::class)
+        ->constructor(\DI\get(ServicePraticienInterface::class)),
+];
