@@ -23,8 +23,6 @@ CREATE TABLE "public"."praticien" (
     "email" character varying(128) NOT NULL,
     "telephone" character varying(24) NOT NULL,
     "specialite_id" integer NOT NULL,
-    "structure_id" uuid,
-    "rpps_id" character varying(12),
     "organisation" bit(1) DEFAULT '0' NOT NULL,
     "nouveau_patient" bit(1) DEFAULT '1' NOT NULL,
     "titre" character varying(8) DEFAULT 'Dr.' NOT NULL

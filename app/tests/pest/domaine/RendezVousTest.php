@@ -109,7 +109,7 @@ it('derives the end time from the visit reason', function () {
 
     $attendus = [
         'CI' => ['duree' => 30, 'fin' => '10:30'],
-        'C0' => ['duree' => 20, 'fin' => '10:20'],
+        'CO' => ['duree' => 20, 'fin' => '10:20'],
         'CS' => ['duree' => 15, 'fin' => '10:15'],
     ];
 

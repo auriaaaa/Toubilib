@@ -93,7 +93,7 @@ class RendezVous
     {
         return match ($this->motif_visite) {
             'CI' => 'Consultation initiale',
-            'CO', 'C0' => 'Consultation',
+            'CO' => 'Consultation',
             'CS' => 'Consultation de suivi',
             default => $this->motif_visite,
         };

@@ -24,21 +24,21 @@ class GetRendezVousAction {
         $modifiable = $this->serviceRendezVous->statutModifiable($id);
 
         $links = [
-            'self'      => ['href' => '/rdvs/' . $rdv->id],
+            'self'      => ['href' => '/rendezvous/' . $rdv->id],
             'praticien' => ['href' => '/praticiens/' . $rdv->praticien_id],
             'patient'   => ['href' => '/patients/' . $rdv->patient_id],
         ];
 
         if ($modifiable) {
-            $links['annuler'] = ['href' => '/rdvs/' . $rdv->id . '/annuler'];
-            $links['honorer'] = ['href' => '/rdvs/' . $rdv->id . '/honorer'];
-            $links['ignorer'] = ['href' => '/rdvs/' . $rdv->id . '/ignorer'];
+            $links['annuler'] = ['href' => '/rendezvous/' . $rdv->id . '/annuler'];
+            $links['honorer'] = ['href' => '/rendezvous/' . $rdv->id . '/honorer'];
+            $links['ignorer'] = ['href' => '/rendezvous/' . $rdv->id . '/ignorer'];
         }
 
         $data = [
             'type'       => 'ressource',
             'rendez_vous' => $rdv,
-            'links'      => $links,
+            '_links'      => $links,
         ];
 
         $rs->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

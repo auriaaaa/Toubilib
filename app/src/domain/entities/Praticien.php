@@ -9,7 +9,7 @@ class Praticien
 {
     private const MOTIF_DUREE = [
         'CI' => 30,
-        'C0' => 20,
+        'CO' => 20,
         'CS' => 15,
     ];
 
@@ -24,8 +24,6 @@ class Praticien
     private string $email;
     private string $telephone;
     private int $specialite_id;
-    private string $structure_id;
-    private string $rpps_id;
     private bool $organisation;
     private bool $nouveau_patient;
     private string $titre;
@@ -41,8 +39,6 @@ class Praticien
         string $email,
         string $telephone,
         int $specialite_id,
-        string $structure_id,
-        string $rpps_id,
         bool $organisation,
         bool $nouveau_patient,
         string $titre
@@ -54,8 +50,6 @@ class Praticien
         $this->email = $email;
         $this->telephone = $telephone;
         $this->specialite_id = $specialite_id;
-        $this->structure_id = $structure_id;
-        $this->rpps_id = $rpps_id;
         $this->organisation = $organisation;
         $this->nouveau_patient = $nouveau_patient;
         $this->titre = $titre;
@@ -68,8 +62,6 @@ class Praticien
     public function getVille(): string { return $this->ville; }
     public function getEmail(): string { return $this->email; }
     public function getTelephone(): string { return $this->telephone; }
-    public function getStructureId(): string { return $this->structure_id; }
-    public function getRppsId(): string { return $this->rpps_id; }
     public function isOrganisation(): bool { return $this->organisation; }
     public function isNewPatient(): bool { return $this->nouveau_patient; }
     public function getTitre(): string { return $this->titre; }

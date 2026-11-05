@@ -29,7 +29,7 @@ class GetRendezVousPatientAction
         foreach ($rendezvous as $rdv) {
             $liste[] = [
                 'rendez_vous' => $rdv,
-                'links' => [
+                '_links' => [
                     'self' => ['href' => '/rendezvous/' . $rdv->id],
                 ],
             ];
@@ -40,7 +40,7 @@ class GetRendezVousPatientAction
             'patient' => ['id' => $id],
             'nombre' => count($liste),
             'rendez_vous' => $liste,
-            'links'  => [
+            '_links'  => [
                 'self'    => ['href' => '/patients/' . $id . '/rendezvous'],
                 'patient' => ['href' => '/patients/' . $id],
                 'all'     => ['href' => '/patients'],

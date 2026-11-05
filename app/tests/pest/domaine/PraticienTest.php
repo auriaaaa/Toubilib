@@ -27,7 +27,7 @@ beforeEach(function () {
 
 it('accepts the known visit reasons', function () {
 
-    foreach (['CI', 'C0', 'CS'] as $motif) {
+    foreach (['CI', 'CO', 'CS'] as $motif) {
         expect($this->praticien->verifierMotif($motif))->toBeTrue();
     }
 });
@@ -51,7 +51,7 @@ it('refuses an empty visit reason or one with the wrong case', function () {
 it('calculates the duration from the visit reason', function () {
 
     expect($this->praticien->duree('CI'))->toBe(30)
-        ->and($this->praticien->duree('C0'))->toBe(20)
+        ->and($this->praticien->duree('CO'))->toBe(20)
         ->and($this->praticien->duree('CS'))->toBe(15);
 });
 

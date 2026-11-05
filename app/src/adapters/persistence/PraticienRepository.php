@@ -19,8 +19,8 @@ class PraticienRepository implements PraticienRepositoryInterface {
 
     public function save(Praticien $praticien): void {
         try {
-            $stmt = $this->pdo->prepare('INSERT INTO praticien (id, nom, prenom, specialite_id, ville, email, telephone, structure_id, rpps_id, organisation, nouveau_patient, titre) 
-                                              VALUES (:id, :nom, :prenom, :specialite_id, :ville, :email, :telephone, :structure_id, :rpps_id, :organisation, :nouveau_patient, :titre)
+            $stmt = $this->pdo->prepare('INSERT INTO praticien (id, nom, prenom, specialite_id, ville, email, telephone, organisation, nouveau_patient, titre) 
+                                              VALUES (:id, :nom, :prenom, :specialite_id, :ville, :email, :telephone, :organisation, :nouveau_patient, :titre)
                                               ON CONFLICT (id) DO UPDATE SET 
                                               nom = EXCLUDED.nom,
                                               prenom = EXCLUDED.prenom,
@@ -28,8 +28,6 @@ class PraticienRepository implements PraticienRepositoryInterface {
                                               ville = EXCLUDED.ville,
                                               email = EXCLUDED.email,
                                               telephone = EXCLUDED.telephone,
-                                              structure_id = EXCLUDED.structure_id,
-                                              rpps_id = EXCLUDED.rpps_id,
                                               organisation = EXCLUDED.organisation,
                                               nouveau_patient = EXCLUDED.nouveau_patient,
                                               titre = EXCLUDED.titre');
@@ -41,8 +39,6 @@ class PraticienRepository implements PraticienRepositoryInterface {
                 'ville' => $praticien->getVille(),
                 'email' => $praticien->getEmail(),
                 'telephone' => $praticien->getTelephone(),
-                'structure_id' => $praticien->getStructureId(),
-                'rpps_id' => $praticien->getRppsId(),
                 'organisation' => $praticien->isOrganisation() ? 'true' : 'false',
                 'nouveau_patient' => $praticien->isNewPatient() ? 'true' : 'false',
                 'titre' => $praticien->getTitre()
@@ -76,8 +72,6 @@ class PraticienRepository implements PraticienRepositoryInterface {
             $data['email'],
             $data['telephone'],
             (int)$data['specialite_id'],
-            $data['structure_id'],
-            $data['rpps_id'] ?? '',
             (bool)$data['organisation'],
             (bool)$data['nouveau_patient'],
             $data['titre']
@@ -146,8 +140,6 @@ class PraticienRepository implements PraticienRepositoryInterface {
                 $data['email'],
                 $data['telephone'],
                 (int)$data['specialite_id'],
-                $data['structure_id'],
-                $data['rpps_id'] ?? '',
                 (bool)$data['organisation'],
                 (bool)$data['nouveau_patient'],
                 $data['titre']
@@ -189,8 +181,6 @@ class PraticienRepository implements PraticienRepositoryInterface {
                 $data['email'],
                 $data['telephone'],
                 (int) $data['specialite_id'],
-                $data['structure_id'],
-                $data['rpps_id'] ?? '',
                 (bool) $data['organisation'],
                 (bool) $data['nouveau_patient'],
                 $data['titre']
