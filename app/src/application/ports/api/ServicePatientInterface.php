@@ -12,4 +12,6 @@ interface ServicePatientInterface
     public function getPatient(string $id): PatientDTO;
 
     public function getAllPatients(): array; // return PatientDTO[]
+
+    public function getHistoriqueRendezVous(string $patientId): array; // return RendezVousDTO[]
 }

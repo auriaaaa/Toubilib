@@ -38,7 +38,8 @@ return function (App $app): void {
     // Patients
     $app->group('/patients', function (RouteCollectorProxy $group) {
         $group->get('[/]', \toubilib\adapters\controllers\actions\GetAllPatientAction::class);  
-        $group->get('/{id}[/]', \toubilib\adapters\controllers\actions\GetPatientAction::class);          
+        $group->get('/{id}[/]', \toubilib\adapters\controllers\actions\GetPatientAction::class);   
+        $group->get('/{id}/rendezvous[/]',\toubilib\adapters\controllers\actions\GetRendezVousPatientAction::class);
     });
 
     $app->options('/{routes:.+}', function (Request $request, Response $response): Response {

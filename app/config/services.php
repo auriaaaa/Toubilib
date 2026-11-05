@@ -47,5 +47,8 @@ return [
         ),
 
     ServicePatientInterface::class => \DI\create(ServicePatient::class)
-        ->constructor(\DI\get(PatientRepositoryInterface::class)),
+        ->constructor(
+            \DI\get(PatientRepositoryInterface::class),
+            \DI\get(RendezVousRepositoryInterface::class)
+        ),
 ];

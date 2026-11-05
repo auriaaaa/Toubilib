@@ -9,6 +9,7 @@ use toubilib\adapters\controllers\actions\GetPatientAction;
 use toubilib\adapters\controllers\actions\GetPraticienAction;
 use toubilib\adapters\controllers\actions\GetPraticienAgendaAction;
 use toubilib\adapters\controllers\actions\GetRendezVousAction;
+use toubilib\adapters\controllers\actions\GetRendezVousPatientAction;
 use toubilib\adapters\controllers\actions\HonorerRendezVousAction;
 use toubilib\adapters\controllers\actions\IgnorerRendezVousAction;
 use toubilib\adapters\controllers\middlewares\Cors;
@@ -58,6 +59,9 @@ return [
         ->constructor(\DI\get(ServicePatientInterface::class)),
 
     GetPatientAction::class => \DI\create(GetPatientAction::class)
+        ->constructor(\DI\get(ServicePatientInterface::class)),
+
+    GetRendezVousPatientAction::class => \DI\create(GetRendezVousPatientAction::class)
         ->constructor(\DI\get(ServicePatientInterface::class)),
 
 ];

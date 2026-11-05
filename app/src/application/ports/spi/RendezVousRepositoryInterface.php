@@ -8,4 +8,6 @@ interface RendezVousRepositoryInterface
     public function save(RendezVous $rendezVous): void;
 
     public function findById(string $id): RendezVous;
+
+    public function findByPatientId(string $patientId): array; // return RendezVous[]
 } 

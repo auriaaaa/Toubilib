@@ -1,6 +1,8 @@
 <?php
 namespace toubilib\adapters\persistence;
 
+use DateTime;
+
 use toubilib\application\ports\spi\RendezVousRepositoryInterface;
 use toubilib\domain\entities\RendezVous;
 use toubilib\adapters\persistence\RepositoryDatabaseErrorException;
@@ -66,9 +68,9 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
             $data['id'],
             $data['praticien_id'],
             $data['patient_id'],
-            new \DateTime($data['date_heure_debut']),
-            new \DateTime($data['date_heure_fin']),
-            new \DateTime($data['date_creation']),
+            new DateTime($data['date_heure_debut']),
+            new DateTime($data['date_heure_fin']),
+            new DateTime($data['date_creation']),
             (int)$data['statut'],
             (int)$data['duree'],
             $data['motif_visite']
@@ -78,6 +80,45 @@ class RendezVousRepository implements RendezVousRepositoryInterface {
         $rdv->setInformationsPraticien($data['praticien_nom'], $data['praticien_prenom']);
 
         return $rdv;
+    }
+
+    public function findByPatientId(string $patientId): array {
+        $stmt = $this->pdo->prepare(
+            'SELECT r.*,
+                    pa.nom    AS patient_nom,
+                    pa.prenom AS patient_prenom,
+                    pr.nom    AS praticien_nom,
+                    pr.prenom AS praticien_prenom
+            FROM rdv r
+            LEFT JOIN patient pa   ON r.patient_id = pa.id
+            LEFT JOIN praticien pr ON r.praticien_id = pr.id
+            WHERE r.patient_id = :id
+            ORDER BY r.date_heure_debut DESC'
+        );
+        $stmt->execute(['id' => $patientId]);
+
+        $resultat = [];
+
+        while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $rdv = new RendezVous(
+                $data['id'],
+                $data['praticien_id'],
+                $data['patient_id'],
+                new DateTime($data['date_heure_debut']),
+                new DateTime($data['date_heure_fin']),
+                new DateTime($data['date_creation']),
+                (int)$data['statut'],
+                (int)$data['duree'],
+                $data['motif_visite']
+            );
+
+            $rdv->setInformationsPatient($data['patient_nom'], $data['patient_prenom']);
+            $rdv->setInformationsPraticien($data['praticien_nom'], $data['praticien_prenom']);
+
+            $resultat[] = $rdv;
+        }
+
+        return $resultat;
     }
 
 }
