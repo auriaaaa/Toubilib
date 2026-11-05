@@ -18,22 +18,14 @@ class Cors
             $response = $handler->handle($request);
         }
 
-        $origin = $request->getHeaderLine('Origin');
-
-        // Sans origine : utiliser * sans autoriser les credentials
-        if ($origin === '') {
-            $origin = '*';
-        }
-
         $requestHeaders = $request->getHeaderLine('Access-Control-Request-Headers');
 
         if ($requestHeaders === '') { $requestHeaders = 'Content-Type, Authorization'; }
 
         return $response
-            ->withHeader('Access-Control-Allow-Origin', $origin)
+            ->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Headers', $requestHeaders)
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Credentials', 'true')
-            ->withHeader('Vary', 'Origin');
+            ->withHeader('Access-Control-Max-Age', '86400');
     }
 }

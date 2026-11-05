@@ -5,7 +5,7 @@ namespace toubilib\application\dto;
 use DateTime;
 use toubilib\application\exceptions\ValidationException;
 
-final class CreateRendezVousDTO {
+final class CreerRendezVousDTO {
 
     private const LONGUEUR_MAX = 64;
     private const ID_REGEX = '/^[A-Za-z0-9_-]+$/';

@@ -2,9 +2,9 @@
 
 use tests\pest\fakes\InMemoryPatientRepository;
 use tests\pest\fakes\InMemoryPraticienRepository;
-use toubilib\application\dto\CreateRendezVousDTO;
+use toubilib\application\dto\CreerRendezVousDTO;
 use toubilib\application\exceptions\ValidationException;
-use toubilib\application\validators\CreateRendezVousValidator;
+use toubilib\application\validators\CreerRendezVousValidator;
 use toubilib\domain\entities\Patient;
 use toubilib\domain\entities\Praticien;
 
@@ -21,7 +21,7 @@ beforeEach(function () {
         '54000', 'Nancy', 'c.martin@example.fr', '0611111111'
     ));
 
-    $this->validator = new CreateRendezVousValidator($praticiens, $patients);
+    $this->validator = new CreerRendezVousValidator($praticiens, $patients);
 
    $this->dto = function (array $champs = []) {
         $donnees = array_merge([
@@ -32,7 +32,7 @@ beforeEach(function () {
         ], $champs);
         $donnees['date_heure_debut'] = (new DateTime($donnees['date_heure_debut']))->format('Y-m-d\TH:i:s');
 
-        return CreateRendezVousDTO::fromArray($donnees);
+        return CreerRendezVousDTO::fromArray($donnees);
     };
 });
 

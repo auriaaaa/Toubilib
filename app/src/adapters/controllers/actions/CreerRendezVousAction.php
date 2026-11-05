@@ -4,7 +4,6 @@ namespace toubilib\adapters\controllers\actions;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use toubilib\application\dto\CreateRendezVousDTO;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 
 class CreerRendezVousAction
@@ -18,13 +17,8 @@ class CreerRendezVousAction
 
     public function __invoke(ServerRequestInterface $rq, ResponseInterface $rs, array $args): ResponseInterface
     {
-        $donnees = $rq->getParsedBody();
+        $dto = $rq->getAttribute('creerRdvDto');
 
-        if (!is_array($donnees)) {
-            throw new \InvalidArgumentException('Le corps de la requête doit être un objet JSON valide.');
-        }
-
-        $dto = CreateRendezVousDTO::fromArray($donnees);
         $rdv = $this->serviceRendezVous->creer($dto);
 
         $rs->getBody()->write(json_encode($rdv));

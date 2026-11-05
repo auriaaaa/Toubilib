@@ -3,11 +3,11 @@
 use tests\pest\fakes\InMemoryPatientRepository;
 use tests\pest\fakes\InMemoryPraticienRepository;
 use tests\pest\fakes\InMemoryRendezVousRepository;
-use toubilib\application\dto\CreateRendezVousDTO;
+use toubilib\application\dto\CreerRendezVousDTO;
 use toubilib\application\dto\RendezVousDTO;
 use toubilib\application\exceptions\ValidationException;
 use toubilib\application\usecases\ServiceRendezVous;
-use toubilib\application\validators\CreateRendezVousValidator;
+use toubilib\application\validators\CreerRendezVousValidator;
 use toubilib\domain\entities\Patient;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\entities\RendezVous;
@@ -53,7 +53,7 @@ beforeEach(function () {
         $this->rendezVousRepository,
         $this->praticienRepository,
         $this->patientRepository,
-        new CreateRendezVousValidator($this->praticienRepository, $this->patientRepository)
+        new CreerRendezVousValidator($this->praticienRepository, $this->patientRepository)
     );
 
     $this->rdv = fn (string $debut, int $duree = 30, int $statut = 0) => new RendezVous(
@@ -77,7 +77,7 @@ beforeEach(function () {
         ], $champs);
         $donnees['date_heure_debut'] = (new DateTime($donnees['date_heure_debut']))->format('Y-m-d\TH:i:s');
 
-        return CreateRendezVousDTO::fromArray($donnees);
+        return CreerRendezVousDTO::fromArray($donnees);
     };
 });
 

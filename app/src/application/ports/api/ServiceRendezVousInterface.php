@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace toubilib\application\ports\api;
 
 use toubilib\application\dto\RendezVousDTO;
-use toubilib\application\dto\CreateRendezVousDTO;
+use toubilib\application\dto\CreerRendezVousDTO;
 
 interface ServiceRendezVousInterface
 {
     public function getRendezVous(string $id): RendezVousDTO;
 
-    public function creer(CreateRendezVousDTO $dto): RendezVousDTO;
+    public function creer(CreerRendezVousDTO $dto): RendezVousDTO;
     
     public function annuler(string $id): RendezVousDTO;
 

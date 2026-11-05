@@ -1,12 +1,12 @@
 <?php
 namespace toubilib\application\validators;
 
-use toubilib\application\dto\CreateRendezVousDTO;
+use toubilib\application\dto\CreerRendezVousDTO;
 use toubilib\application\exceptions\ValidationException;
 use toubilib\application\ports\spi\PatientRepositoryInterface;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 
-class CreateRendezVousValidator {
+class CreerRendezVousValidator {
 
     private PraticienRepositoryInterface $praticienRepository;
     private PatientRepositoryInterface $patientRepository;
@@ -19,7 +19,7 @@ class CreateRendezVousValidator {
         $this->patientRepository = $patientRepository;
     }
 
-    public function valider(CreateRendezVousDTO $dto): void {
+    public function valider(CreerRendezVousDTO $dto): void {
         $errors = [];
 
         if (!$this->praticienRepository->existe($dto->praticien_id)) {

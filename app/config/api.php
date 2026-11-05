@@ -10,6 +10,7 @@ use toubilib\adapters\controllers\actions\GetRendezVousAction;
 use toubilib\adapters\controllers\actions\HonorerRendezVousAction;
 use toubilib\adapters\controllers\actions\IgnorerRendezVousAction;
 use toubilib\adapters\controllers\middlewares\Cors;
+use toubilib\adapters\controllers\middlewares\CreerRendezVousValidationMiddleware;
 use toubilib\application\ports\api\ServicePraticienInterface;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 
@@ -17,6 +18,8 @@ return [
 
     // Middleware
     Cors::class => \DI\create(Cors::class),
+
+    CreerRendezVousValidationMiddleware::class => \DI\create(CreerRendezVousValidationMiddleware::class),
 
     // Actions qui utilisent le service  rendez-vous
     CreerRendezVousAction::class => \DI\create(CreerRendezVousAction::class)

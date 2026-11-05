@@ -4,7 +4,7 @@ use toubilib\adapters\persistence\{PatientRepository, PraticienRepository, Rende
 use toubilib\application\ports\api\{ServicePraticienInterface, ServiceRendezVousInterface};
 use toubilib\application\ports\spi\{PatientRepositoryInterface, PraticienRepositoryInterface, RendezVousRepositoryInterface};
 use toubilib\application\usecases\{ServicePraticien, ServiceRendezVous};
-use toubilib\application\validators\CreateRendezVousValidator;
+use toubilib\application\validators\CreerRendezVousValidator;
 
 return [
 
@@ -28,7 +28,7 @@ return [
         ->constructor(\DI\get('toubilib.pdo')),
 
     // Validateur 
-    CreateRendezVousValidator::class => \DI\create(CreateRendezVousValidator::class)
+    CreerRendezVousValidator::class => \DI\create(CreerRendezVousValidator::class)
         ->constructor(
             \DI\get(PraticienRepositoryInterface::class),
             \DI\get(PatientRepositoryInterface::class)
@@ -43,6 +43,6 @@ return [
             \DI\get(RendezVousRepositoryInterface::class),
             \DI\get(PraticienRepositoryInterface::class),
             \DI\get(PatientRepositoryInterface::class),
-            \DI\get(CreateRendezVousValidator::class)
+            \DI\get(CreerRendezVousValidator::class)
         ),
 ];

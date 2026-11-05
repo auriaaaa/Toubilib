@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace toubilib\application\usecases;
 
-use toubilib\application\dto\CreateRendezVousDTO;
+use toubilib\application\dto\CreerRendezVousDTO;
 use toubilib\application\dto\RendezVousDTO;
 use toubilib\application\exceptions\ValidationException;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
 use toubilib\application\ports\spi\PatientRepositoryInterface;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\ports\spi\RendezVousRepositoryInterface;
-use toubilib\application\validators\CreateRendezVousValidator;
+use toubilib\application\validators\CreerRendezVousValidator;
 use toubilib\domain\entities\RendezVous;
 use toubilib\domain\exceptions\PraticienIndisponibleException;
 
@@ -20,13 +20,13 @@ class ServiceRendezVous implements ServiceRendezVousInterface
     private RendezVousRepositoryInterface $rendezVousRepository;
     private PraticienRepositoryInterface $praticienRepository;
     private PatientRepositoryInterface $patientRepository;
-    private CreateRendezVousValidator $validator;
+    private CreerRendezVousValidator $validator;
 
     public function __construct(
         RendezVousRepositoryInterface $rendezVousRepository,
         PraticienRepositoryInterface $praticienRepository,
         PatientRepositoryInterface $patientRepository,
-        CreateRendezVousValidator $validator
+        CreerRendezVousValidator $validator
     ) {
         $this->rendezVousRepository = $rendezVousRepository;
         $this->praticienRepository = $praticienRepository;
@@ -41,7 +41,7 @@ class ServiceRendezVous implements ServiceRendezVousInterface
         return RendezVousDTO::fromEntity($rendezVous);
     }
 
-    public function creer(CreateRendezVousDTO $dto): RendezVousDTO
+    public function creer(CreerRendezVousDTO $dto): RendezVousDTO
     {
         $this->validator->valider($dto);
 

@@ -13,7 +13,7 @@ use toubilib\application\ports\api\ServiceRendezVousInterface;
 use toubilib\adapters\persistence\PraticienRepository;
 use toubilib\adapters\persistence\PatientRepository;
 use toubilib\application\ports\spi\PatientRepositoryInterface;
-use toubilib\application\validators\CreateRendezVousValidator;
+use toubilib\application\validators\CreerRendezVousValidator;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\application\usecases\ServicePraticien;
 use toubilib\application\ports\api\ServicePraticienInterface;
@@ -32,11 +32,11 @@ final class ContainerConfig
                         \DI\get(RendezVousRepositoryInterface::class),
                         \DI\get(PraticienRepositoryInterface::class),
                         \DI\get(PatientRepositoryInterface::class),
-                        \DI\get(CreateRendezVousValidator::class)
+                        \DI\get(CreerRendezVousValidator::class)
                     ),
 
-            CreateRendezVousValidator::class =>
-                \DI\create(CreateRendezVousValidator::class)
+            CreerRendezVousValidator::class =>
+                \DI\create(CreerRendezVousValidator::class)
                     ->constructor(
                         \DI\get(PraticienRepositoryInterface::class),
                         \DI\get(PatientRepositoryInterface::class)

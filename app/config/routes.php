@@ -4,6 +4,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
+use toubilib\adapters\controllers\middlewares\CreerRendezVousValidationMiddleware;
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
 use toubilib\adapters\controllers\actions\CreerRendezVousAction;
 use toubilib\adapters\controllers\actions\GetAllPraticienAction;
@@ -18,7 +19,8 @@ return function (App $app): void {
 
     // Rendez-vous
     $app->group('/rendezvous', function (RouteCollectorProxy $group) {
-        $group->post('[/]', CreerRendezVousAction::class);           
+        $group->post('[/]', CreerRendezVousAction::class)
+            ->add(CreerRendezVousValidationMiddleware::class);       
         $group->get('/{id}[/]', GetRendezVousAction::class);       
         $group->post('/{id}/annuler[/]', AnnulerRendezVousAction::class);
         $group->post('/{id}/honorer[/]', HonorerRendezVousAction::class);
