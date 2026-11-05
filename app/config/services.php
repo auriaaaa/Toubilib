@@ -1,9 +1,9 @@
 <?php
 use Psr\Container\ContainerInterface;
 use toubilib\adapters\persistence\{PatientRepository, PraticienRepository, RendezVousRepository};
-use toubilib\application\ports\api\{ServicePraticienInterface, ServiceRendezVousInterface};
+use toubilib\application\ports\api\{ServicePraticienInterface, ServiceRendezVousInterface, ServicePatientInterface};
 use toubilib\application\ports\spi\{PatientRepositoryInterface, PraticienRepositoryInterface, RendezVousRepositoryInterface};
-use toubilib\application\usecases\{ServicePraticien, ServiceRendezVous};
+use toubilib\application\usecases\{ServicePraticien, ServiceRendezVous, ServicePatient};
 use toubilib\application\validators\CreerRendezVousValidator;
 
 return [
@@ -45,4 +45,7 @@ return [
             \DI\get(PatientRepositoryInterface::class),
             \DI\get(CreerRendezVousValidator::class)
         ),
+
+    ServicePatientInterface::class => \DI\create(ServicePatient::class)
+        ->constructor(\DI\get(PatientRepositoryInterface::class)),
 ];

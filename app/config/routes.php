@@ -35,6 +35,12 @@ return function (App $app): void {
         $group->get('/{id}/creneaux-occupes[/]', GetCreneauxOccupesPraticienAction::class);  // ?debut=&fin=
     });
 
+    // Patients
+    $app->group('/patients', function (RouteCollectorProxy $group) {
+        $group->get('[/]', \toubilib\adapters\controllers\actions\GetAllPatientAction::class);  
+        $group->get('/{id}[/]', \toubilib\adapters\controllers\actions\GetPatientAction::class);          
+    });
+
     $app->options('/{routes:.+}', function (Request $request, Response $response): Response {
         return $response;
     });

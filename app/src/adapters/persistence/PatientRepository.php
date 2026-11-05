@@ -64,6 +64,25 @@ class PatientRepository implements PatientRepositoryInterface {
         );
     }
 
+    public function findAll(): array {
+        $stmt = $this->pdo->query('SELECT * FROM patient');
+        $patients = [];
+        while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $patients[] = new Patient(
+                $data['id'],
+                $data['nom'],
+                $data['prenom'],
+                $data['date_naissance'],
+                $data['adresse'],
+                $data['code_postal'],
+                $data['ville'],
+                $data['email'],
+                $data['telephone']
+            );
+        }
+        return $patients;
+    }
+
     public function existe(string $id): bool {
         $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM patient WHERE id = :id');
         $stmt->execute(['id' => $id]);

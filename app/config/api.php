@@ -2,8 +2,10 @@
 
 use toubilib\adapters\controllers\actions\AnnulerRendezVousAction;
 use toubilib\adapters\controllers\actions\CreerRendezVousAction;
+use toubilib\adapters\controllers\actions\GetAllPatientAction;
 use toubilib\adapters\controllers\actions\GetAllPraticienAction;
 use toubilib\adapters\controllers\actions\GetCreneauxOccupesPraticienAction;
+use toubilib\adapters\controllers\actions\GetPatientAction;
 use toubilib\adapters\controllers\actions\GetPraticienAction;
 use toubilib\adapters\controllers\actions\GetPraticienAgendaAction;
 use toubilib\adapters\controllers\actions\GetRendezVousAction;
@@ -13,6 +15,7 @@ use toubilib\adapters\controllers\middlewares\Cors;
 use toubilib\adapters\controllers\middlewares\CreerRendezVousValidationMiddleware;
 use toubilib\application\ports\api\ServicePraticienInterface;
 use toubilib\application\ports\api\ServiceRendezVousInterface;
+use toubilib\application\ports\api\ServicePatientInterface;
 
 return [
 
@@ -49,4 +52,12 @@ return [
 
     GetCreneauxOccupesPraticienAction::class => \DI\create(GetCreneauxOccupesPraticienAction::class)
         ->constructor(\DI\get(ServicePraticienInterface::class)),
+
+    // Actions qui utilisent le service des patients
+    GetAllPatientAction::class => \DI\create(GetAllPatientAction::class)
+        ->constructor(\DI\get(ServicePatientInterface::class)),
+
+    GetPatientAction::class => \DI\create(GetPatientAction::class)
+        ->constructor(\DI\get(ServicePatientInterface::class)),
+
 ];

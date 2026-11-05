@@ -9,5 +9,7 @@ interface PatientRepositoryInterface
 
     public function findById(string $id): Patient;
 
+    public function findAll(): array; // return Patient[]
+
     public function existe(string $id): bool;
 } 
