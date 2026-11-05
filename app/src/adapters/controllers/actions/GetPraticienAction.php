@@ -27,6 +27,7 @@ class GetPraticienAction {
         $praticien_dto = $this->servicePraticien->getPraticien($id);
 
         $data = [
+            'type' => 'ressource',
             'praticien' => $praticien_dto,
             '_links' => [
                 'self' => [
@@ -41,7 +42,7 @@ class GetPraticienAction {
                     'href' => '/praticiens/' . $id . '/agenda',
                     'method' => 'GET'
                 ],
-                'creneaux' => [
+                'creneaux-occupes' => [
                     'href' => '/praticiens/' . $id . '/creneaux-occupes',
                     'method' => 'GET'
                 ]

@@ -12,24 +12,25 @@ final class RendezVousAgendaDTO
         public readonly string $date_heure_fin,
         public readonly int $duree,
         public readonly string $motif_visite,
-        public readonly int $statut,
-        public readonly string $patient_id,
-        public readonly ?string $patient_nom,
-        public readonly ?string $patient_prenom,
+        public readonly string $etat,
+        public readonly array $patient,
     ) {}
 
     public static function fromEntity(RendezVous $rdv): self
     {
+        $nom = trim(($rdv->getPatientPrenom() ?? '') . ' ' . ($rdv->getPatientNom() ?? ''));
+
         return new self(
             $rdv->getId(),
-            $rdv->getDateHeureDebut()->format('d/m/Y à H:i'),
-            $rdv->getDateHeureFin()->format('d/m/Y à H:i'),
+            $rdv->getDateHeureDebut()->format('d/m/Y H:i'),
+            $rdv->getDateHeureFin()->format('d/m/Y H:i'),
             $rdv->getDuree(),
-            $rdv->getMotifVisite(),
-            $rdv->getStatut(),
-            $rdv->getPatientId(),
-            $rdv->getPatientNom(),
-            $rdv->getPatientPrenom(),
+            $rdv->getMotifLibelle(),
+            $rdv->getEtat(),
+            [
+                'id'  => $rdv->getPatientId(),
+                'nom' => $nom !== '' ? $nom : null,
+            ]
         );
     }
 }

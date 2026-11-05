@@ -27,7 +27,7 @@ class GetCreneauxOccupesPraticienAction
             || !is_string($params['debut'])
             || !is_string($params['fin'])) {
             throw new \InvalidArgumentException(
-                'Les paramètres debut et fin sont obligatoires (ex. ?debut=2025-12-01&fin=2025-12-05).'
+                'Les paramètres debut et fin sont obligatoires (ex. ?debut=2026-10-01&fin=2026-10-31).'
             );
         }
 
@@ -52,13 +52,14 @@ class GetCreneauxOccupesPraticienAction
         }
 
         $data = [
+            'type' => 'collection',
             'praticien' => ['id' => $id],
             'periode' => [
-                'debut' => $debut->format('Y-m-d'),
-                'fin'   => $fin->format('Y-m-d'),
+                'debut' => $debut->format('d/m/Y'),
+                'fin'   => $fin->format('d/m/Y'),
             ],
             'nombre' => count($creneaux),
-            'creneaux' => $creneaux,
+            'creneaux-occupes' => $creneaux,
             '_links' => [
                 'self' => [
                     'href' => $rq->getUri()->getPath()

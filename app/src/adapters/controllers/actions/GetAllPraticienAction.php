@@ -53,7 +53,7 @@ class GetAllPraticienAction {
                         'href' => '/praticiens/' . $id . '/agenda',
                         'method' => 'GET'
                     ],
-                    'creneaux' => [
+                    'creneaux-occupes' => [
                         'href' => '/praticiens/' . $id . '/creneaux-occupes',
                         'method' => 'GET'
                     ]
@@ -78,6 +78,7 @@ class GetAllPraticienAction {
         }
 
         $data = [
+            'type' => 'collection',
             'nombre' => count($praticiens),
             'criteres' => [
                 'specialite' => $specialite,

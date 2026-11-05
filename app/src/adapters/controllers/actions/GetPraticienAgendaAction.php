@@ -28,7 +28,7 @@ class GetPraticienAgendaAction
             || !is_string($params['debut'])
             || !is_string($params['fin'])) {
             throw new \InvalidArgumentException(
-                'Les paramètres debut et fin sont obligatoires (ex. ?debut=2025-12-01&fin=2025-12-05).'
+                'Les paramètres debut et fin sont obligatoires (ex. ?debut=2026-10-01&fin=2026-10-31).'
             );
         }
 
@@ -42,16 +42,27 @@ class GetPraticienAgendaAction
 
         $rendezVous = $this->servicePraticien->getRendezVousPourPeriode($id, $debut, $fin);
 
+        $liste = [];
+
+        foreach ($rendezVous as $rdv) {
+            $liste[] = [
+                'rendez_vous' => $rdv,
+                '_links' => [
+                    'self'    => ['href' => '/rendezvous/' . $rdv->id, 'method' => 'GET'],
+                    'patient' => ['href' => '/patients/' . $rdv->patient['id'], 'method' => 'GET'],
+                ],
+            ];
+        }
+
         $data = [
-            'praticien' => [
-                'id' => $id
-            ],
+            'type' => 'collection',
+            'praticien' => ['id' => $id],
             'periode' => [
                 'debut' => $debut->format('d/m/Y'),
-                'fin' => $fin->format('d/m/Y')
+                'fin'   => $fin->format('d/m/Y'),
             ],
-            'nombre' => count($rendezVous),
-            'rendezVous' => $rendezVous,
+            'nombre' => count($liste),
+            'rendez_vous' => $liste,
             '_links' => [
                 'self' => [
                     'href' => $rq->getUri()->getPath()
@@ -59,14 +70,8 @@ class GetPraticienAgendaAction
                         . '&fin=' . urlencode($params['fin']),
                     'method' => 'GET',
                 ],
-                'praticien' => [
-                    'href' => '/praticiens/' . $id,
-                    'method' => 'GET',
-                ],
-                'creneaux' => [
-                    'href' => '/praticiens/' . $id . '/creneaux-occupes',
-                    'method' => 'GET',
-                ],
+                'praticien' => ['href' => '/praticiens/' . $id, 'method' => 'GET'],
+                'creneaux-occupes'  => ['href' => '/praticiens/' . $id . '/creneaux-occupes', 'method' => 'GET'],
             ],
         ];
 

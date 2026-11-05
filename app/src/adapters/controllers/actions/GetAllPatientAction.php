@@ -42,6 +42,7 @@ class GetAllPatientAction {
 
 
         $data = [
+            'type' => 'collection',
             'nombre' => count($patients),
             'patients' => $patients,
             '_links' => [

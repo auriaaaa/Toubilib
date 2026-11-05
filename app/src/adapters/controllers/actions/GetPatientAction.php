@@ -27,6 +27,7 @@ class GetPatientAction {
         $patient_dto = $this->servicePatient->getPatient($id);
 
         $data = [
+            'type' => 'ressource',
             'patient' => $patient_dto,
             '_links' => [
                 'self' => [

@@ -24,15 +24,15 @@ class GetRendezVousAction {
         $modifiable = $this->serviceRendezVous->statutModifiable($id);
 
         $links = [
-            'self'      => ['href' => '/rendezvous/' . $rdv->id],
-            'praticien' => ['href' => '/praticiens/' . $rdv->praticien_id],
-            'patient'   => ['href' => '/patients/' . $rdv->patient_id],
+            'self'      => ['href' => '/rendezvous/' . $rdv->id, 'method' => 'GET'],
+            'praticien' => ['href' => '/praticiens/' . $rdv->praticien_id, 'method' => 'GET'],
+            'patient'   => ['href' => '/patients/' . $rdv->patient_id, 'method' => 'GET'],
         ];
 
         if ($modifiable) {
-            $links['annuler'] = ['href' => '/rendezvous/' . $rdv->id . '/annuler'];
-            $links['honorer'] = ['href' => '/rendezvous/' . $rdv->id . '/honorer'];
-            $links['ignorer'] = ['href' => '/rendezvous/' . $rdv->id . '/ignorer'];
+            $links['annuler'] = ['href' =>  '/rendezvous/' . $rdv->id . '/annuler', 'method' => 'POST'];
+            $links['honorer'] = ['href' => '/rendezvous/' . $rdv->id . '/honorer', 'method' => 'POST'];
+            $links['ignorer'] = ['href' => '/rendezvous/' . $rdv->id . '/ignorer', 'method' => 'POST'];
         }
 
         $data = [
