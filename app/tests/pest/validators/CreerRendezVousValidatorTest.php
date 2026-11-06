@@ -12,7 +12,7 @@ beforeEach(function () {
     $praticiens = new InMemoryPraticienRepository();
     $praticiens->save(new Praticien(
         'praticien-uuid-1', 'Dupont', 'Jean', 'Nancy', 'j.dupont@example.fr', '0600000000',
-        1, 'structure-1', '12345678901', false, true, 'Dr'
+        1, false, true, 'Dr'
     ));
 
     $patients = new InMemoryPatientRepository();

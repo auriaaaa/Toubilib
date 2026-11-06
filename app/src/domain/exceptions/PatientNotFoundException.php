@@ -1,4 +1,4 @@
 <?php
 namespace toubilib\domain\exceptions;
 
-class PraticienNotFoundException extends EntityNotFoundException {}
+class PatientNotFoundException extends EntityNotFoundException {}

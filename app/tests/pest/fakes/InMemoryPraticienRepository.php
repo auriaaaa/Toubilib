@@ -5,6 +5,7 @@ namespace tests\pest\fakes;
 use DateTime;
 use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\domain\entities\Praticien;
+use toubilib\domain\exceptions\PraticienNotFoundException;
 
 class InMemoryPraticienRepository implements PraticienRepositoryInterface
 {
@@ -18,7 +19,7 @@ class InMemoryPraticienRepository implements PraticienRepositoryInterface
     public function findById(string $id): Praticien
     {
         if (!isset($this->praticiens[$id])) {
-            throw new \Exception('Praticien not found');
+            throw new PraticienNotFoundException("Aucun praticien trouvé avec l'ID : $id");
         }
 
         return $this->praticiens[$id];

@@ -4,6 +4,7 @@ namespace tests\pest\fakes;
 
 use toubilib\application\ports\spi\RendezVousRepositoryInterface;
 use toubilib\domain\entities\RendezVous;
+use toubilib\domain\exceptions\RendezVousNotFoundException;
 
 class InMemoryRendezVousRepository implements RendezVousRepositoryInterface
 {
@@ -17,9 +18,22 @@ class InMemoryRendezVousRepository implements RendezVousRepositoryInterface
     public function findById(string $id): RendezVous
     {
         if (!isset($this->rendezVous[$id])) {
-            throw new \Exception('Rendez-vous not found');
+            throw new RendezVousNotFoundException("Aucun rendez-vous trouvé avec l'ID : $id");
         }
 
         return $this->rendezVous[$id];
+    }
+
+    public function findByPatientId(string $patientId): array
+    {
+        $resultat = [];
+
+        foreach ($this->rendezVous as $rdv) {
+            if ($rdv->getPatientId() === $patientId) {
+                $resultat[] = $rdv;
+            }
+        }
+
+        return $resultat;
     }
 }

@@ -30,7 +30,7 @@ function makeRendezVous(int $statut = 0, ?DateTime $dateDebut = null, int $duree
 beforeEach(function () {
     $this->praticien = new Praticien(
         'praticien-uuid-1', 'Dupont', 'Jean', 'Nancy', 'j.dupont@example.fr', '0600000000',
-        1, 'structure-1', '12345678901', false, true, 'Dr'
+        1, false, true, 'Dr'
     );
 
     $this->patient = new Patient(
@@ -50,29 +50,16 @@ it('should cancel a created appointment', function () {
     expect($rdv->getStatut())->toBe(1);
 });
 
-it('should not cancel an already cancelled appointment', function () {
+it('should not cancel an appointment that is not in created state', function (int $statut) {
 
-    $rdv = makeRendezVous(1);
-
-    expect(fn () => $rdv->annuler())
-        ->toThrow(Exception::class);
-});
-
-it('should not cancel an honoured appointment', function () {
-
-    $rdv = makeRendezVous(2);
+    $rdv = makeRendezVous($statut);
 
     expect(fn () => $rdv->annuler())
-        ->toThrow(Exception::class);
-});
+        ->toThrow(StatutRendezVousInvalideException::class);
 
-it('should not cancel an ignored appointment', function () {
-
-    $rdv = makeRendezVous(3);
-
-    expect(fn () => $rdv->annuler())
-        ->toThrow(Exception::class);
-});
+    // L'état ne change pas quand l'annulation est refusée
+    expect($rdv->getStatut())->toBe($statut);
+})->with([[1], [2], [3]]);
 
 it('should not cancel a past appointment', function () {
 
@@ -82,7 +69,9 @@ it('should not cancel a past appointment', function () {
     );
 
     expect(fn () => $rdv->annuler())
-        ->toThrow(Exception::class);
+        ->toThrow(RendezVousDejaPasseException::class);
+
+    expect($rdv->getStatut())->toBe(0);
 });
 
 // ------------------------------------------------------------ creer()
@@ -165,7 +154,7 @@ it('refuses a weekend date', function () {
 
 it('refuses a time outside opening hours', function () {
 
-    // trop tôt, finit après 18h (17:45 + 30 min), trop tard
+    // trop tôt | finit après 18h (17:45 + 30 min) | trop tard
     foreach (['07:00', '17:45', '19:00'] as $heure) {
         expect(fn () => RendezVous::creer(
             $this->praticien,
@@ -211,7 +200,7 @@ it('accepts an appointment right after one of the praticien', function () {
 
 it('accepts an appointment on the slot of a cancelled one', function () {
 
-    // RDV annulé (statut 1) : son créneau est libre
+    // RDV annulé (statut 1) donc son créneau est libre
     $this->praticien->ajouterRendezVous(
         makeRendezVous(1, new DateTime('next monday 10:00'), 30)
     );
@@ -368,3 +357,40 @@ it('considers an appointment with an unknown status not modifiable', function ()
 
     expect($rdv->statutModifiable())->toBeFalse();
 });
+
+// ------------------------------------------------------------ getEtat()
+it('exposes a readable state', function (int $statut, string $etat) {
+
+    expect(makeRendezVous($statut)->getEtat())->toBe($etat);
+})->with([
+    [0, 'PREVU'],
+    [1, 'ANNULE'],
+    [2, 'HONORE'],
+    [3, 'IGNORE'],
+    [99, 'INCONNU'],
+]);
+
+// ------------------------------------------------------------ getMotifLibelle()
+it('gives a readable label for each visit reason', function (string $motif, string $libelle) {
+
+    $debut = new DateTime('+1 day');
+
+    $rdv = new RendezVous(
+        RDV_UUID,
+        'praticien-uuid-1',
+        'patient-uuid-1',
+        $debut,
+        (clone $debut)->modify('+20 minutes'),
+        new DateTime('now'),
+        0,
+        20,
+        $motif
+    );
+
+    expect($rdv->getMotifLibelle())->toBe($libelle);
+})->with([
+    ['CI', 'Consultation initiale'],
+    ['CO', 'Consultation'],
+    ['CS', 'Consultation de suivi'],
+    ['ZZ', 'ZZ'],
+]);

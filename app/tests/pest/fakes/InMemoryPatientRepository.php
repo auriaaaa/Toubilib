@@ -6,6 +6,7 @@ namespace tests\pest\fakes;
 
 use toubilib\application\ports\spi\PatientRepositoryInterface;
 use toubilib\domain\entities\Patient;
+use toubilib\domain\exceptions\PatientNotFoundException;
 
 class InMemoryPatientRepository implements PatientRepositoryInterface
 {
@@ -19,10 +20,15 @@ class InMemoryPatientRepository implements PatientRepositoryInterface
     public function findById(string $id): Patient
     {
         if (!isset($this->patients[$id])) {
-            throw new \Exception('Patient not found');
+            throw new PatientNotFoundException("Aucun patient trouvé avec l'ID : $id");
         }
 
         return $this->patients[$id];
+    }
+
+    public function findAll(): array
+    {
+        return array_values($this->patients);
     }
 
     public function existe(string $id): bool

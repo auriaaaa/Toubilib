@@ -11,6 +11,7 @@ use toubilib\application\validators\CreerRendezVousValidator;
 use toubilib\domain\entities\Patient;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\entities\RendezVous;
+use toubilib\domain\exceptions\RendezVousNotFoundException;
 use toubilib\domain\exceptions\RendezVousPasPasseException;
 use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 
@@ -40,7 +41,7 @@ beforeEach(function () {
 
     $this->praticien = new Praticien(
         'praticien-uuid-1', 'Dupont', 'Jean', 'Nancy', 'j.dupont@example.fr', '0600000000',
-        1, 'structure-1', '12345678901', false, true, 'Dr'
+        1, false, true, 'Dr'
     );
     $this->praticienRepository->save($this->praticien);
 
@@ -87,7 +88,11 @@ it('should return a rendez-vous DTO by id', function () {
 
     $this->rendezVousRepository->save(($this->rdv)('+2 days', 20));
 
-    expect($this->service->getRendezVous('rdv-uuid-1'))->toBeInstanceOf(RendezVousDTO::class);
+    $result = $this->service->getRendezVous('rdv-uuid-1');
+
+    expect($result)->toBeInstanceOf(RendezVousDTO::class)
+        ->and($result->id)->toBe('rdv-uuid-1')
+        ->and($result->etat)->toBe('PREVU');
 });
 
 it('should throw an exception when rendez-vous does not exist', function () {
@@ -95,7 +100,7 @@ it('should throw an exception when rendez-vous does not exist', function () {
     $id = '00000000-0000-0000-0000-000000000000';
 
     expect(fn () => $this->service->getRendezVous($id))
-        ->toThrow(Exception::class, "Aucun rendez-vous trouvé avec l'ID : $id");
+        ->toThrow(RendezVousNotFoundException::class, "Aucun rendez-vous trouvé avec l'ID : $id");
 });
 
 // ------------------------------------------------------------ annuler()
@@ -107,7 +112,7 @@ it('should cancel a rendez-vous', function () {
     $result = $this->service->annuler('rdv-uuid-1');
 
     expect($result)->toBeInstanceOf(RendezVousDTO::class)
-        ->and($result->statut)->toBe(1);
+        ->and($result->etat)->toBe('ANNULE');
 });
 
 it('should throw an exception when cancelling an unknown rendez-vous', function () {
@@ -115,7 +120,7 @@ it('should throw an exception when cancelling an unknown rendez-vous', function 
     $id = '00000000-0000-0000-0000-000000000000';
 
     expect(fn () => $this->service->annuler($id))
-        ->toThrow(Exception::class, "Aucun Rendez-vous trouvé avec l'ID : $id");
+        ->toThrow(RendezVousNotFoundException::class, "Aucun rendez-vous trouvé avec l'ID : $id");
 });
 
 // ------------------------------------------------------------ creer()
@@ -127,9 +132,17 @@ it('should create a rendez-vous and return its data', function () {
     expect($result)->toBeInstanceOf(RendezVousDTO::class)
         ->and($result->praticien_id)->toBe('praticien-uuid-1')
         ->and($result->patient_id)->toBe('patient-uuid-1')
-        ->and($result->date_heure_debut->format('H:i'))->toBe('10:00')
+        ->and($result->date_debut)->toEndWith('10:00')
         ->and($result->duree)->toBe(30)
-        ->and($result->statut)->toBe(0);
+        ->and($result->etat)->toBe('PREVU');
+});
+
+it('should return the names of the praticien and of the patient', function () {
+
+    $result = $this->service->creer(($this->dto)());
+
+    expect($result->praticien_nom)->toBe('Jean Dupont')
+        ->and($result->patient_nom)->toBe('Claire Martin');
 });
 
 it('should persist the created rendez-vous', function () {
@@ -220,7 +233,7 @@ it('should create a rendez-vous right after one of the praticien', function () {
 
     $result = $this->service->creer(($this->dto)(['date_heure_debut' => 'next monday 10:30']));
 
-    expect($result->date_heure_debut->format('H:i'))->toBe('10:30')
+    expect($result->date_debut)->toEndWith('10:30')
         ->and($this->rendezVousRepository->saves)->toBe(1);
 });
 
@@ -231,7 +244,7 @@ it('should create a rendez-vous on the slot of a cancelled one', function () {
 
     $result = $this->service->creer(($this->dto)());
 
-    expect($result->statut)->toBe(0)
+    expect($result->etat)->toBe('PREVU')
         ->and($this->rendezVousRepository->saves)->toBe(1);
 });
 
@@ -244,7 +257,7 @@ it('should honour a past rendez-vous and return its DTO', function () {
     $result = $this->service->honorer('rdv-uuid-1');
 
     expect($result)->toBeInstanceOf(RendezVousDTO::class)
-        ->and($result->statut)->toBe(2)
+        ->and($result->etat)->toBe('HONORE')
         ->and($this->rendezVousRepository->saves)->toBe(2);
 });
 
@@ -254,7 +267,6 @@ it('should not honour a future rendez-vous', function () {
     expect(fn () => $this->service->honorer('rdv-uuid-1'))
         ->toThrow(RendezVousPasPasseException::class);
 
-    // Seule la sauvegarde initiale du rendez-vous a eu lieu.
     expect($this->rendezVousRepository->saves)->toBe(1);
 });
 
@@ -289,7 +301,7 @@ it('should throw an exception when honouring an unknown rendez-vous', function (
     $id = '00000000-0000-0000-0000-000000000000';
 
     expect(fn () => $this->service->honorer($id))
-        ->toThrow(Exception::class, "Aucun rendez-vous trouvé avec l'ID : $id");
+        ->toThrow(RendezVousNotFoundException::class, "Aucun rendez-vous trouvé avec l'ID : $id");
 
     expect($this->rendezVousRepository->saves)->toBe(0);
 });
@@ -303,7 +315,7 @@ it('should ignore a past rendez-vous and return its DTO', function () {
     $result = $this->service->ignorer('rdv-uuid-1');
 
     expect($result)->toBeInstanceOf(RendezVousDTO::class)
-        ->and($result->statut)->toBe(3)
+        ->and($result->etat)->toBe('IGNORE')
         ->and($this->rendezVousRepository->saves)->toBe(2);
 });
 
@@ -347,7 +359,7 @@ it('should throw an exception when ignoring an unknown rendez-vous', function ()
     $id = '00000000-0000-0000-0000-000000000000';
 
     expect(fn () => $this->service->ignorer($id))
-        ->toThrow(Exception::class, "Aucun rendez-vous trouvé avec l'ID : $id");
+        ->toThrow(RendezVousNotFoundException::class, "Aucun rendez-vous trouvé avec l'ID : $id");
 
     expect($this->rendezVousRepository->saves)->toBe(0);
 });
@@ -389,7 +401,7 @@ it('should throw an exception when checking the status of an unknown rendez-vous
     $id = '00000000-0000-0000-0000-000000000000';
 
     expect(fn () => $this->service->statutModifiable($id))
-        ->toThrow(Exception::class, "Aucun rendez-vous trouvé avec l'ID : $id");
+        ->toThrow(RendezVousNotFoundException::class, "Aucun rendez-vous trouvé avec l'ID : $id");
 
     expect($this->rendezVousRepository->saves)->toBe(0);
 });

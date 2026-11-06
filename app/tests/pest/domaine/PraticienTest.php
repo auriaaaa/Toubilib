@@ -7,7 +7,7 @@ use toubilib\domain\exceptions\PraticienIndisponibleException;
 beforeEach(function () {
     $this->praticien = new Praticien(
         'praticien-uuid-1', 'Dupont', 'Jean', 'Nancy', 'j.dupont@example.fr', '0600000000',
-        1, 'structure-1', '12345678901', false, true, 'Dr'
+        1, false, true, 'Dr'
     );
 
     $this->rdv = fn (string $debut, int $duree = 30, int $statut = 0) => new RendezVous(

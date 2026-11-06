@@ -34,13 +34,3 @@ final class PatientDTO
         );
     }
 }
-
-// public function getId(): string { return $this->id; }
-//     public function getNom(): string { return $this->nom; }
-//     public function getPrenom(): string { return $this->prenom; }
-//     public function getDateNaissance(): string { return $this->date_naissance; }
-//     public function getAdresse(): string { return $this->adresse; }
-//     public function getCodePostal(): string { return $this->code_postal; }
-//     public function getVille(): string { return $this->ville; }
-//     public function getEmail(): string { return $this->email; }
-//     public function getTelephone(): string { return $this->telephone; }
