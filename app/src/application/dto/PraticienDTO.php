@@ -27,7 +27,7 @@ final class PraticienDTO
             $praticien->getVille(),
             $praticien->getEmail(),
             $praticien->getTelephone(),
-            $praticien->getSpecialiteId(),
+            $praticien->getSpecialite()->getId(),
             $praticien->getTitre()
         );
     }

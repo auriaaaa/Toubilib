@@ -11,8 +11,8 @@ use toubilib\domain\exceptions\StatutRendezVousInvalideException;
 class RendezVous
 {
     private string $id;
-    private string $praticien_id;
-    private string $patient_id;
+    private Praticien $praticien;
+    private Patient $patient;
     private DateTime $date_heure_debut;
     private DateTime $date_heure_fin;
     private DateTime $date_creation;    
@@ -28,8 +28,8 @@ class RendezVous
 
     public function __construct(
         string $id,
-        string $praticien_id,
-        string $patient_id,
+        Praticien $praticien,
+        Patient $patient,
         DateTime $date_heure_debut,
         DateTime $date_heure_fin,
         DateTime $date_creation,
@@ -38,8 +38,8 @@ class RendezVous
         string $motif_visite,
     ) {
         $this->id = $id;
-        $this->praticien_id = $praticien_id;
-        $this->patient_id = $patient_id;
+        $this->praticien = $praticien;
+        $this->patient = $patient;
         $this->date_heure_debut = $date_heure_debut;
         $this->date_heure_fin = $date_heure_fin;
         $this->date_creation = $date_creation;
@@ -49,8 +49,10 @@ class RendezVous
     }
 
     public function getId(): string { return $this->id; }
-    public function getPraticienId(): string { return $this->praticien_id; }
-    public function getPatientId(): string { return $this->patient_id; }
+    public function getPraticien(): Praticien { return $this->praticien; }
+    public function getPatient(): Patient { return $this->patient; }
+    public function getPraticienId(): string { return $this->praticien->getId(); }
+    public function getPatientId(): string { return $this->patient->getId(); }
     public function getDateHeureDebut(): DateTime { return $this->date_heure_debut; }
     public function getDateHeureFin(): DateTime { return $this->date_heure_fin; }
     public function getDateCreation(): DateTime{ return $this->date_creation; }
@@ -58,9 +60,9 @@ class RendezVous
     public function getDuree(): int { return $this->duree; }
     public function getMotifVisite(): string { return $this->motif_visite; }
 
-    public function getPatientNom(): ?string { return $this->patientNom; }
+    public function getPatientNom(): ?string { return $this->patient->getNom(); }
 
-    public function getPatientPrenom(): ?string { return $this->patientPrenom; }
+    public function getPatientPrenom(): ?string { return $this->patient->getPrenom(); }
 
     public function setInformationsPatient(?string $nom, ?string $prenom): void
     {
@@ -68,14 +70,24 @@ class RendezVous
         $this->patientPrenom = $prenom;
     }
 
-    public function getPraticienNom(): ?string { return $this->praticienNom; }
-    public function getPraticienPrenom(): ?string { return $this->praticienPrenom; }
+    public function getPraticienNom(): ?string { return $this->praticien->getNom(); }
+    public function getPraticienPrenom(): ?string { return $this->praticien->getPrenom(); }
 
     public function setInformationsPraticien(?string $nom, ?string $prenom): void
     {
         $this->praticienNom = $nom;
         $this->praticienPrenom = $prenom;
     }
+
+    // -------------------------------------------------------------- Setters
+
+    public function setPraticien(Praticien $praticien): void { $this->praticien = $praticien; }
+    public function setPatient(Patient $patient): void { $this->patient = $patient; }
+    public function setDateHeureDebut(DateTime $date_heure_debut): void { $this->date_heure_debut = $date_heure_debut; }
+    public function setDateHeureFin(DateTime $date_heure_fin): void { $this->date_heure_fin = $date_heure_fin; }
+    public function setStatut(int $statut): void { $this->statut = $statut; }
+    public function setDuree(int $duree): void { $this->duree = $duree; }
+    public function setMotifVisite(string $motif_visite): void { $this->motif_visite = $motif_visite; }
 
     // Valeur lisible de l'état pour l'API
     public function getEtat(): string
@@ -122,8 +134,8 @@ class RendezVous
 
         $rendezVous = new self(
             uniqid(),
-            $praticien->getId(),
-            $patient->getId(),
+            $praticien,
+            $patient,
             $debut,
             $fin,
             clone $maintenant,

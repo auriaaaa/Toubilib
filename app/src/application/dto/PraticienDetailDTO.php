@@ -31,7 +31,7 @@ final class PraticienDetailDTO
             $praticien->getEmail(),
             $praticien->getTelephone(),
             $praticien->getVille(),
-            $praticien->isNewPatient(),
+            $praticien->getIsNewPatient(),
             $specialite?->getLibelle(),
             $specialite?->getDescription(),
         );

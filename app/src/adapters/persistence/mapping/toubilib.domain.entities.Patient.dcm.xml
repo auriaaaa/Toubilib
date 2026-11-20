@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+        https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="toubilib\domain\entities\Patient" table="patient"
+            repository-class="toubilib\adapters\persistence\PatientDoctrineRepository">
+
+        <id name="id" type="string" length="64" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="nom" type="string" length="64"/>
+        <field name="prenom" type="string" length="64"/>
+        <field name="date_naissance" type="date" nullable="true"/>
+        <field name="adresse" type="text" nullable="true"/>
+        <field name="code_postal" type="string" length="8" nullable="true"/>
+        <field name="ville" type="string" length="64" nullable="true"/>
+        <field name="email" type="string" length="128" nullable="true"/>
+        <field name="telephone" type="string" length="24"/>
+
+        <one-to-many field="rendezVous" target-entity="toubilib\domain\entities\RendezVous" mapped-by="patient"/>
+    </entity>
+</doctrine-mapping>

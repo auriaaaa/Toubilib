@@ -39,8 +39,8 @@ class PraticienRepository implements PraticienRepositoryInterface {
                 'ville' => $praticien->getVille(),
                 'email' => $praticien->getEmail(),
                 'telephone' => $praticien->getTelephone(),
-                'organisation' => $praticien->isOrganisation() ? 'true' : 'false',
-                'nouveau_patient' => $praticien->isNewPatient() ? 'true' : 'false',
+                'organisation' => $praticien->getIsOrganisation() ? 'true' : 'false',
+                'nouveau_patient' => $praticien->getIsNewPatient() ? 'true' : 'false',
                 'titre' => $praticien->getTitre()
             ]);
         } catch (\PDOException $e) {

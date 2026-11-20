@@ -1,31 +1,42 @@
 <?php
+
+use Doctrine\DBAL\DriverManager;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMSetup;
 use Psr\Container\ContainerInterface;
-use toubilib\adapters\persistence\{PatientRepository, PraticienRepository, RendezVousRepository};
+
 use toubilib\application\ports\api\{ServicePraticienInterface, ServiceRendezVousInterface, ServicePatientInterface};
 use toubilib\application\ports\spi\{PatientRepositoryInterface, PraticienRepositoryInterface, RendezVousRepositoryInterface};
 use toubilib\application\usecases\{ServicePraticien, ServiceRendezVous, ServicePatient};
 use toubilib\application\validators\CreerRendezVousValidator;
+use toubilib\domain\entities\{Patient, Praticien, RendezVous};
 
 return [
 
-    // Connexion PDO
-    'toubilib.pdo' => function (ContainerInterface $c): \PDO {
-        $dsn = sprintf('%s:host=%s;port=%s;dbname=%s',
-            $c->get('db.driver'), $c->get('db.host'), $c->get('db.port'), $c->get('db.name'));
+    'doctrine.mapping_path' => __DIR__ . '/../src/adapters/persistence/mapping/',
 
-        return new \PDO($dsn, $c->get('db.user'), $c->get('db.password'), [
-            \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-        ]);
+    // EntityManager Doctrine
+    EntityManagerInterface::class => function (ContainerInterface $c): EntityManagerInterface {
+        $config = ORMSetup::createXMLMetadataConfiguration([$c->get('doctrine.mapping_path')],  true);
+        $connection = DriverManager::getConnection($c->get('db'), $config);
+
+        return new EntityManager($connection, $config);
     },
 
     // Repositories
-    PraticienRepositoryInterface::class  => \DI\create(PraticienRepository::class)
-        ->constructor(\DI\get('toubilib.pdo')),
-    PatientRepositoryInterface::class    => \DI\create(PatientRepository::class)
-        ->constructor(\DI\get('toubilib.pdo')),
-    RendezVousRepositoryInterface::class => \DI\create(RendezVousRepository::class)
-        ->constructor(\DI\get('toubilib.pdo')),
+    PraticienRepositoryInterface::class => function (ContainerInterface $c) {
+        return $c->get(EntityManagerInterface::class)->getRepository(Praticien::class);
+    },
+    PatientRepositoryInterface::class => function (ContainerInterface $c) {
+        return $c->get(EntityManagerInterface::class)->getRepository(Patient::class);
+    },
+    RendezVousRepositoryInterface::class => function (ContainerInterface $c) {
+        return $c->get(EntityManagerInterface::class)->getRepository(RendezVous::class);
+    },
+    SpecialiteRepositoryInterface::class => function (ContainerInterface $c) {
+        return $c->get(EntityManagerInterface::class)->getRepository(Specialite::class);
+    },
 
     // Validateur 
     CreerRendezVousValidator::class => \DI\create(CreerRendezVousValidator::class)

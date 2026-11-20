@@ -25,7 +25,7 @@ final class PatientDTO
             $patient->getId(),
             $patient->getNom(),
             $patient->getPrenom(),
-            $patient->getDateNaissance(),
+            $patient->getDateNaissance()?->format('Y-m-d'),
             $patient->getAdresse(),
             $patient->getCodePostal(),
             $patient->getVille(),

@@ -3,6 +3,8 @@
 namespace toubilib\domain\entities;
 
 use DateTime;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use toubilib\domain\exceptions\PraticienIndisponibleException;
 
 class Praticien
@@ -23,13 +25,12 @@ class Praticien
     private string $ville;
     private string $email;
     private string $telephone;
-    private int $specialite_id;
     private bool $organisation;
     private bool $nouveau_patient;
     private string $titre;
 
-    private array $rendezVous = [];
-    private ?Specialite $specialite = null;
+    private Collection $rendezVous;
+    private Specialite $specialite;
 
     public function __construct(
         string $id,
@@ -38,7 +39,7 @@ class Praticien
         string $ville,
         string $email,
         string $telephone,
-        int $specialite_id,
+        Specialite $specialite,
         bool $organisation,
         bool $nouveau_patient,
         string $titre
@@ -49,32 +50,45 @@ class Praticien
         $this->ville = $ville;
         $this->email = $email;
         $this->telephone = $telephone;
-        $this->specialite_id = $specialite_id;
+        $this->specialite = $specialite;
         $this->organisation = $organisation;
         $this->nouveau_patient = $nouveau_patient;
         $this->titre = $titre;
+        $this->rendezVous = new ArrayCollection();
     }
 
+    // -------------------------------------------------------------- Getters
+
     public function getId(): string { return $this->id; }
-    public function getNom(): string { return $this->nom; }
     public function getPrenom(): string { return $this->prenom; }
-    public function getSpecialiteId(): int { return $this->specialite_id; }
+    public function getNom(): string { return $this->nom; }
     public function getVille(): string { return $this->ville; }
     public function getEmail(): string { return $this->email; }
     public function getTelephone(): string { return $this->telephone; }
-    public function isOrganisation(): bool { return $this->organisation; }
-    public function isNewPatient(): bool { return $this->nouveau_patient; }
+    public function getIsOrganisation(): bool { return $this->organisation; }
+    public function getIsNewPatient(): bool { return $this->nouveau_patient; }
     public function getTitre(): string { return $this->titre; }
-
-    public function getRendezVous(): array { return $this->rendezVous; }
-
     public function getSpecialite(): ?Specialite { return $this->specialite; }
-    public function setSpecialite(?Specialite $specialite): void { $this->specialite = $specialite; }
+    public function getRendezVous(): Collection { return $this->rendezVous; }
 
-    public function ajouterRendezVous(RendezVous $rendezVous): void
-    {
+    // -------------------------------------------------------------- Setters
+
+    public function setNom(string $nom): void { $this->nom = $nom; }
+    public function setPrenom(string $prenom): void { $this->prenom = $prenom; }
+    public function setVille(string $ville): void { $this->ville = $ville; }
+    public function setEmail(string $email): void { $this->email = $email; }
+    public function setTelephone(string $telephone): void { $this->telephone = $telephone; }
+    public function setIsOrganisation(bool $organisation): void { $this->organisation = $organisation; }
+    public function setIsNewPatient(bool $nouveau_patient): void { $this->nouveau_patient = $nouveau_patient; }
+    public function setTitre(string $titre): void { $this->titre = $titre; }
+    public function setSpecialite(Specialite $specialite): void { $this->specialite = $specialite;}
+
+    public function ajouterRendezVous(RendezVous $rendezVous): void {
         $this->rendezVous[] = $rendezVous;
     }
+
+    // -------------------------------------------------------------- Méthodes métiers
+
 
     public function verifierMotif($motif_visite) : bool {
 
