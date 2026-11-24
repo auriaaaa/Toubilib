@@ -8,7 +8,7 @@ use toubilib\application\ports\spi\PatientRepositoryInterface;
 use toubilib\domain\entities\Patient;
 use toubilib\domain\exceptions\PatientNotFoundException;
 
-class PatientDoctrineRepository extends EntityRepository implements PatientRepositoryInterface
+class DoctrinePatientRepository extends EntityRepository implements PatientRepositoryInterface
 {
     public function save(Patient $patient): void
     {

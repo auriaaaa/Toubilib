@@ -5,7 +5,7 @@
         https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="toubilib\domain\entities\Patient" table="patient"
-            repository-class="toubilib\adapters\persistence\PatientDoctrineRepository">
+        repository-class="toubilib\adapters\persistence\DoctrinePatientRepository">
 
         <id name="id" type="string" length="64" column="id">
             <generator strategy="NONE"/>

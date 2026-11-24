@@ -5,7 +5,7 @@ use Doctrine\ORM\EntityRepository;
 use toubilib\application\ports\spi\SpecialiteRepositoryInterface;
 use toubilib\domain\entities\Specialite;
 
-class SpecialiteDoctrineRepository extends EntityRepository implements SpecialiteRepositoryInterface
+class DoctrineSpecialiteRepository extends EntityRepository implements SpecialiteRepositoryInterface
 {
     public function rechercherParMotCle(string $motCle): array
     {

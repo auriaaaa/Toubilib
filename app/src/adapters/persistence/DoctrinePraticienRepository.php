@@ -9,7 +9,7 @@ use toubilib\application\ports\spi\PraticienRepositoryInterface;
 use toubilib\domain\entities\Praticien;
 use toubilib\domain\exceptions\PraticienNotFoundException;
 
-class PraticienDoctrineRepository extends EntityRepository implements PraticienRepositoryInterface
+class DoctrinePraticienRepository extends EntityRepository implements PraticienRepositoryInterface
 {
     public function save(Praticien $praticien): void
     {

@@ -9,7 +9,7 @@ use toubilib\application\ports\spi\RendezVousRepositoryInterface;
 use toubilib\domain\entities\RendezVous;
 use toubilib\domain\exceptions\RendezVousNotFoundException;
 
-class RendezVousDoctrineRepository extends EntityRepository implements RendezVousRepositoryInterface
+class DoctrineRendezVousRepository extends EntityRepository implements RendezVousRepositoryInterface
 {
     public function save(RendezVous $rendezVous): void
     {
